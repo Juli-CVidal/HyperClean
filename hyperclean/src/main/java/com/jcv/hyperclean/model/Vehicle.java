@@ -5,11 +5,13 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
+@SuperBuilder
+@NoArgsConstructor
 @Table(name = "vehicle")
 public class Vehicle extends BasicModel {
     private String model;

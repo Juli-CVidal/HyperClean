@@ -1,10 +1,14 @@
 package com.jcv.hyperclean.dto;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
+@SuperBuilder
+@NoArgsConstructor
 public abstract class BasicDTO {
-    private Long id;
+    protected Long id;
 }

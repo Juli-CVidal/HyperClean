@@ -6,13 +6,15 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
+@SuperBuilder
+@NoArgsConstructor
 @Table(name = "appointment")
 public class Appointment extends BasicModel {
     private LocalDateTime appointmentDate;

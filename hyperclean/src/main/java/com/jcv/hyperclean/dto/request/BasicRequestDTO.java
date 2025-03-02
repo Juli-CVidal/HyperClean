@@ -6,5 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public abstract class BasicRequestDTO {
-    private Long id;
+    protected Long id;
 }

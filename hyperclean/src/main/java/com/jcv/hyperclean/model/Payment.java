@@ -7,18 +7,20 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
+@SuperBuilder
+@NoArgsConstructor
 @Table(name = "payment")
 public class Payment extends BasicModel {
 
     private Double price;
-    private LocalDate paymentDate;
+    private LocalDateTime paymentDate;
 
     @OneToOne
     @JoinColumn(name = "appointment_id")
