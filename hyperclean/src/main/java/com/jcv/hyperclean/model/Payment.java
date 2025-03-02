@@ -1,5 +1,6 @@
 package com.jcv.hyperclean.model;
 
+import com.jcv.hyperclean.dto.request.PaymentRequestDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -25,4 +26,11 @@ public class Payment extends BasicModel {
     @OneToOne
     @JoinColumn(name = "appointment_id")
     private Appointment appointment;
+
+    public static Payment of(PaymentRequestDTO requestDTO) {
+        return Payment.builder()
+                .price(requestDTO.getPrice())
+                .paymentDate(requestDTO.getPaymentDate())
+                .build();
+    }
 }

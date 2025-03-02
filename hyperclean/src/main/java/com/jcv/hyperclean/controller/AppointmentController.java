@@ -2,6 +2,9 @@ package com.jcv.hyperclean.controller;
 
 import com.jcv.hyperclean.dto.AppointmentDTO;
 import com.jcv.hyperclean.dto.request.AppointmentRequestDTO;
+import com.jcv.hyperclean.service.AppointmentService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,19 +13,25 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/appointment")
 public class AppointmentController {
+    private final AppointmentService appointmentService;
+
+    @Autowired
+    public AppointmentController(AppointmentService appointmentService) {
+        this.appointmentService = appointmentService;
+    }
 
     @PostMapping
-    public ResponseEntity<AppointmentRequestDTO> create(@RequestBody AppointmentRequestDTO requestDTO) {
-        return null;
+    public ResponseEntity<AppointmentDTO> create(@Valid @RequestBody AppointmentRequestDTO requestDTO) {
+        return ResponseEntity.ok(AppointmentDTO.from(appointmentService.create(requestDTO)));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AppointmentDTO> get(@PathVariable Long id) {
-        return null;
+        return ResponseEntity.ok(AppointmentDTO.from(appointmentService.findById(id)));
     }
 
     @GetMapping("/by-vehicle/{vehicleId}")
     public ResponseEntity<List<AppointmentDTO>> getByVehicle(@PathVariable Long vehicleId) {
-        return null;
+        return ResponseEntity.ok(appointmentService.findByVehicleId(vehicleId));
     }
 }

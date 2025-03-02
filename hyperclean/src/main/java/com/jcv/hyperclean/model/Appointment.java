@@ -1,5 +1,6 @@
 package com.jcv.hyperclean.model;
 
+import com.jcv.hyperclean.dto.request.AppointmentRequestDTO;
 import com.jcv.hyperclean.enums.AppointmentStatus;
 import com.jcv.hyperclean.enums.ServiceType;
 import jakarta.persistence.*;
@@ -28,4 +29,20 @@ public class Appointment extends BasicModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;
+
+    public static Appointment of(AppointmentRequestDTO requestDTO) {
+        return Appointment.builder()
+                .appointmentDate(requestDTO.getAppointmentDate())
+                .status(requestDTO.getStatus())
+                .type(requestDTO.getType())
+                .build();
+    }
+
+    public boolean wasPaid() {
+        return status == AppointmentStatus.PAID;
+    }
+
+    public boolean hasFinished() {
+        return status == AppointmentStatus.FINISHED;
+    }
 }

@@ -13,14 +13,14 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class VehicleDTO extends BasicDTO {
     private String model;
-    private String license;
+    private String licensePlate;
     private CustomerDTO customer;
     private VehicleType type;
 
     public static VehicleDTO from(Vehicle vehicle) {
         return VehicleDTO.builder()
                 .id(vehicle.getId())
-                .license(vehicle.getLicense())
+                .licensePlate(vehicle.getLicensePlate())
                 .customer(CustomerDTO.from(vehicle.getCustomer()))
                 .type(vehicle.getType())
                 .build();
@@ -30,7 +30,7 @@ public class VehicleDTO extends BasicDTO {
         return Vehicle.builder()
                 .id(this.id)
                 .model(this.model)
-                .license(this.license)
+                .licensePlate(this.licensePlate)
                 .customer(this.customer.toModel())
                 .type(this.type)
                 .build();
