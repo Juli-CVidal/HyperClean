@@ -70,12 +70,6 @@
             <version>2.4.0</version>
         </dependency>
 
-        <!-- COMMONS-->
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-        </dependency>
-
         <!-- JUNIT -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class HypercleanApplication {
+public class HyperCleanApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(HypercleanApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(HyperCleanApplication.class, args);
+    }
 
 }
