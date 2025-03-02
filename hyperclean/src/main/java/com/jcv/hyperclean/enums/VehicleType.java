@@ -9,6 +9,7 @@ public enum VehicleType {
     PICKUP(100.0, 120),
     SUPERCAR(150.0, 180);
 
+    // The cost is associated to the interior cleaning service (ServiceType.INTERIOR)
     private final double cost;
     private final int cleaningTime;
 

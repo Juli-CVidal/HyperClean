@@ -1,6 +1,7 @@
 package com.jcv.hyperclean.dto.request;
 
 import com.jcv.hyperclean.enums.AppointmentStatus;
+import com.jcv.hyperclean.enums.ServiceType;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -17,6 +18,8 @@ public class AppointmentRequestDTO extends BasicRequestDTO {
     private LocalDateTime appointmentDate;
 
     private AppointmentStatus status;
+    @NotNull(message = "You must enter the type of service (EXTERIOR, INTERIOR, COMPLETE)")
+    private ServiceType type;
 
     @NotNull(message = "You must assign the appointment to a vehicle")
     private Long vehicleId;
