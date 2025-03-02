@@ -35,4 +35,8 @@ public class VehicleController {
         return ResponseEntity.ok(vehicleService.findByCustomerId(customerId));
     }
 
+    @PutMapping("/{id}/assign-to-customer/{customerId}")
+    public ResponseEntity<VehicleDTO> assignVehicle(@PathVariable Long id, @PathVariable Long customerId) {
+        return ResponseEntity.ok(vehicleService.assignToCustomer(id, customerId));
+    }
 }

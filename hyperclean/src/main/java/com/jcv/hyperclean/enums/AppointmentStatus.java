@@ -2,7 +2,7 @@ package com.jcv.hyperclean.enums;
 
 public enum AppointmentStatus {
     PENDING,
-    IN_PROCESS,
+    IN_PROGRESS,
     FINISHED,
     PAID,
 }

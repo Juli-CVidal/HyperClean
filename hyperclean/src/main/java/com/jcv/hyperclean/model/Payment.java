@@ -1,10 +1,8 @@
 package com.jcv.hyperclean.model;
 
 import com.jcv.hyperclean.dto.request.PaymentRequestDTO;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import com.jcv.hyperclean.enums.PaymentType;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,16 +18,20 @@ import java.time.LocalDateTime;
 @Table(name = "payment")
 public class Payment extends BasicModel {
 
-    private Double price;
+    private Double amount;
     private LocalDateTime paymentDate;
 
     @OneToOne
     @JoinColumn(name = "appointment_id")
     private Appointment appointment;
 
+    @Enumerated(EnumType.STRING)
+    private PaymentType type;
+
     public static Payment of(PaymentRequestDTO requestDTO) {
         return Payment.builder()
-                .price(requestDTO.getPrice())
+                .amount(requestDTO.getAmount())
+                .type(requestDTO.getType())
                 .paymentDate(requestDTO.getPaymentDate())
                 .build();
     }

@@ -2,6 +2,7 @@ package com.jcv.hyperclean.service;
 
 import com.jcv.hyperclean.dto.PaymentDTO;
 import com.jcv.hyperclean.dto.request.PaymentRequestDTO;
+import com.jcv.hyperclean.enums.PaymentType;
 import com.jcv.hyperclean.model.Appointment;
 import com.jcv.hyperclean.model.Payment;
 import com.jcv.hyperclean.repository.PaymentRepository;
@@ -22,10 +23,17 @@ public class PaymentService {
 
     @Transactional
     public PaymentDTO create(PaymentRequestDTO requestDTO) {
+        if (!requestDTO.getType().equals(PaymentType.CASH)) {
+            throw new IllegalArgumentException("Currently we only support payment by cash");
+        }
+
         Appointment appointment = appointmentService.findById(requestDTO.getAppointmentId());
 
         Payment payment = Payment.of(requestDTO);
         payment.setAppointment(appointment);
+        validatePayment(payment);
+
+        appointmentService.markAsPaid(appointment);
         return PaymentDTO.from(paymentRepository.save(payment));
     }
 
@@ -37,5 +45,14 @@ public class PaymentService {
     @Transactional(readOnly = true)
     public PaymentDTO findByAppointmentId(Long appointmentId) {
         return PaymentDTO.from(paymentRepository.findByAppointmentId(appointmentId));
+    }
+
+    private void validatePayment(Payment payment) {
+        Appointment appointment = payment.getAppointment();
+        Double costOfCleaning = appointment.getCostOfCleaning();
+
+        if (costOfCleaning > payment.getAmount()) {
+            throw new IllegalArgumentException("Payment amount is less than the cost of cleaning");
+        }
     }
 }

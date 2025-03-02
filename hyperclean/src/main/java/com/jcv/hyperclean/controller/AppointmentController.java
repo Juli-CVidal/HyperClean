@@ -34,4 +34,14 @@ public class AppointmentController {
     public ResponseEntity<List<AppointmentDTO>> getByVehicle(@PathVariable Long vehicleId) {
         return ResponseEntity.ok(appointmentService.findByVehicleId(vehicleId));
     }
+
+    @PatchMapping("/{id}/mark-as-in-progress")
+    public ResponseEntity<AppointmentDTO> markAsInProgress(@PathVariable Long id) {
+        return ResponseEntity.ok(appointmentService.markAsInProgress(id));
+    }
+
+    @PatchMapping("/{id}/mark-as-finished")
+    public ResponseEntity<AppointmentDTO> markAsFinished(@PathVariable Long id) {
+        return ResponseEntity.ok(appointmentService.markAsFinished(id));
+    }
 }

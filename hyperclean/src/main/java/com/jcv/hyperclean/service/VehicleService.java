@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.jcv.hyperclean.util.ListUtils.mapList;
 
@@ -42,5 +43,19 @@ public class VehicleService {
     public List<VehicleDTO> findByCustomerId(Long customerId) {
         List<Vehicle> vehicles = vehicleRepository.findByCustomerId(customerId);
         return mapList(vehicles, VehicleDTO::from);
+    }
+
+    @Transactional
+    public VehicleDTO assignToCustomer(Long id, Long customerId) {
+        Vehicle vehicle = findById(id);
+
+        // No changes needed
+        if (Objects.equals(vehicle.getCustomer().getId(), customerId)) {
+            return VehicleDTO.from(vehicle);
+        }
+
+        Customer customer = customerService.findById(customerId);
+        vehicle.setCustomer(customer);
+        return VehicleDTO.from(vehicleRepository.save(vehicle));
     }
 }

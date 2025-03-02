@@ -38,11 +38,40 @@ public class Appointment extends BasicModel {
                 .build();
     }
 
+    public boolean isPending() {
+        return status == AppointmentStatus.PENDING;
+    }
+
+    public boolean isInProgress() {
+        return status == AppointmentStatus.IN_PROGRESS;
+    }
+
     public boolean wasPaid() {
         return status == AppointmentStatus.PAID;
     }
 
-    public boolean hasFinished() {
+    public boolean wasMarkedAsFinished() {
         return status == AppointmentStatus.FINISHED;
+    }
+
+    public boolean hasFinished() {
+        if (isInProgress()) {
+            return false;
+        }
+
+        LocalDateTime timeOfFinish = appointmentDate.plusMinutes(getCleaningTime());
+        return LocalDateTime.now().isAfter(timeOfFinish);
+    }
+
+    public boolean isApplicableForPayment() {
+        return hasFinished() && wasMarkedAsFinished();
+    }
+
+    public Double getCostOfCleaning() {
+        return type.calculateCost(vehicle.getType());
+    }
+
+    public Integer getCleaningTime() {
+        return type.calculateCleaningTime(vehicle.getType());
     }
 }

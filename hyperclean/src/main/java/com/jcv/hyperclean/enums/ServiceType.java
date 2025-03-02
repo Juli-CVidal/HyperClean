@@ -18,6 +18,7 @@ public enum ServiceType {
         return vehicleType.getCost() * this.multiplier;
     }
 
+    // In minutes
     public int calculateCleaningTime(VehicleType vehicleType) {
         return (int) (vehicleType.getCleaningTime() * this.multiplier);
     }
