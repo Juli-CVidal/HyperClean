@@ -2,13 +2,13 @@ package com.jcv.hyperclean.cache;
 
 import java.time.Duration;
 
-public class RedisCache<T> {
+public class RedisItemCache<T> {
 
     private final RedisService redisService;
     private final Class<T> type;
     private final Duration duration;
 
-    public RedisCache(RedisService redisService, Class<T> type, Duration duration) {
+    public RedisItemCache(RedisService redisService, Class<T> type, Duration duration) {
         this.redisService = redisService;
         this.type = type;
         this.duration = duration;

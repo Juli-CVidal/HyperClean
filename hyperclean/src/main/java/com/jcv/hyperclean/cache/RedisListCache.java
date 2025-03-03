@@ -13,12 +13,10 @@ import java.util.concurrent.TimeUnit;
 public class RedisListCache<T> {
 
     private final RedisTemplate<String, T> redisTemplate;
-    private final String cacheKey;
     private final Duration duration;
 
-    public RedisListCache(RedisConnectionFactory connectionFactory, String cacheKey, Duration duration) {
+    public RedisListCache(RedisConnectionFactory connectionFactory, Duration duration) {
         this.redisTemplate = setupRedisTemplate(connectionFactory);
-        this.cacheKey = cacheKey;
         this.duration = duration;
     }
 
@@ -31,30 +29,24 @@ public class RedisListCache<T> {
         return template;
     }
 
-    public void set(List<T> values) {
+    public void set(String cacheKey, List<T> values) {
         redisTemplate.delete(cacheKey);
         redisTemplate.opsForList().rightPushAll(cacheKey, values);
         redisTemplate.expire(cacheKey, duration.getSeconds(), TimeUnit.SECONDS);
     }
 
-    public void add(T value) {
+    public void add(String cacheKey, T value) {
         ListOperations<String, T> listOps = redisTemplate.opsForList();
         listOps.rightPush(cacheKey, value);
         redisTemplate.expire(cacheKey, duration.getSeconds(), TimeUnit.SECONDS);
     }
 
-    public List<T> get() {
+    public List<T> get(String cacheKey) {
         ListOperations<String, T> listOps = redisTemplate.opsForList();
         return listOps.range(cacheKey, 0, -1);
     }
 
-    public void invalidate() {
+    public void invalidate(String cacheKey) {
         redisTemplate.delete(cacheKey);
-    }
-
-    public long size() {
-        ListOperations<String, T> listOps = redisTemplate.opsForList();
-        Long size = listOps.size(cacheKey);
-        return size != null ? size : 0;
     }
 }

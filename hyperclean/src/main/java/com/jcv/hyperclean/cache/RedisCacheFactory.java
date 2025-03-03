@@ -1,6 +1,9 @@
 package com.jcv.hyperclean.cache;
 
 import com.jcv.hyperclean.model.Appointment;
+import com.jcv.hyperclean.model.Customer;
+import com.jcv.hyperclean.model.Payment;
+import com.jcv.hyperclean.model.Vehicle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,16 +24,16 @@ public class RedisCacheFactory {
         this.redisConnectionFactory = redisTemplate;
     }
 
-    private <T> RedisCache<T> createCache(Class<T> type, Duration duration) {
-        return new RedisCache<>(redisService, type, duration);
+    private <T> RedisItemCache<T> createCache(Class<T> type, Duration duration) {
+        return new RedisItemCache<>(redisService, type, duration);
     }
 
-    private <T> RedisCache<T> createCache(Class<T> type) {
+    private <T> RedisItemCache<T> createCache(Class<T> type) {
         return createCache(type, DEFAULT_EXPIRATION);
     }
 
     private <T> RedisListCache<T> createListCache(Class<T> type, Duration duration) {
-        return new RedisListCache<>(redisConnectionFactory, type.getSimpleName(), duration);
+        return new RedisListCache<>(redisConnectionFactory, duration);
     }
 
     private <T> RedisListCache<T> createListCache(Class<T> type) {
@@ -38,12 +41,42 @@ public class RedisCacheFactory {
     }
 
     @Bean
-    public RedisCache<Appointment> appointmentDTOCache() {
+    public RedisItemCache<Appointment> appointmentCache() {
         return createCache(Appointment.class);
     }
 
     @Bean
-    public RedisListCache<Appointment> appointmentDTOListCache() {
+    public RedisListCache<Appointment> appointmentListCache() {
         return createListCache(Appointment.class);
+    }
+
+    @Bean
+    public RedisItemCache<Customer> customerCache() {
+        return createCache(Customer.class);
+    }
+
+    @Bean
+    public RedisListCache<Customer> customerListCache() {
+        return createListCache(Customer.class);
+    }
+
+    @Bean
+    public RedisItemCache<Vehicle> vehicleCache() {
+        return createCache(Vehicle.class);
+    }
+
+    @Bean
+    public RedisListCache<Vehicle> vehicleListCache() {
+        return createListCache(Vehicle.class);
+    }
+
+    @Bean
+    public RedisItemCache<Payment> paymentCache() {
+        return createCache(Payment.class);
+    }
+
+    @Bean
+    public RedisListCache<Payment> paymentListCache() {
+        return createListCache(Payment.class);
     }
 }
