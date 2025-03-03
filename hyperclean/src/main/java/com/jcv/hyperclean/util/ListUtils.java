@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ListUtils {
@@ -13,7 +14,11 @@ public class ListUtils {
         }
         return list.stream()
                 .map(mapper)
-                .collect(Collectors.toList());
+                .toList();
+    }
+
+    public static <T> List<T> filterList(List<T> list, Predicate<T> predicate) {
+        return list.stream().filter(predicate).toList();
     }
 
     public static <T, K, V> Map<K, V> listToMap(List<T> list, Function<T, K> keyMapper, Function<T, V> valueMapper) {

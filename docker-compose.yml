@@ -1,4 +1,3 @@
-version: '3.7'
 services:
   mysql:
     image: mysql:8.0
@@ -15,20 +14,12 @@ services:
     volumes:
       - hyperclean_mysql_data:/var/lib/mysql
 
-  memcached:
-    image: memcached
-    container_name: hyperclean_memcached
-    command: [ "-I","20m" ]
-    restart: unless-stopped
+  redis:
+    image: redis
+    container_name: redis
     ports:
-      - 11211:11211
-    networks:
-      - hyperclean_network
+      - "6379:6379"
 
 volumes:
   hyperclean_mysql_data:
     name: hyperclean_mysql_data
-
-networks:
-  hyperclean_network:
-    name: hyperclean_network
