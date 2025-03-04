@@ -37,4 +37,8 @@ public class RedisListCache<T> {
     public void invalidate(String cacheKey) {
         redisTemplate.delete(cacheKey);
     }
+
+    public void flushAll() {
+        redisTemplate.delete(redisTemplate.keys("*"));
+    }
 }

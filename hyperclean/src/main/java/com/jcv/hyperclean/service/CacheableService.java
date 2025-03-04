@@ -48,6 +48,19 @@ public abstract class CacheableService<T extends BasicModel> {
         listCache.invalidate(key);
     }
 
+    protected void flushItemCache() {
+        cache.flushAll();
+    }
+
+    protected void flushListCache() {
+        listCache.flushAll();
+    }
+
+    protected void flushCaches() {
+        flushItemCache();
+        flushListCache();
+    }
+
     /**
      * Searches for an element in the cache first. If not found, it uses the provided method
      * to fetch the element from the database and stores it in the cache for subsequent accesses.

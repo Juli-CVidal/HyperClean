@@ -1,28 +1,34 @@
 package com.jcv.hyperclean.cache;
 
+import com.jcv.hyperclean.cache.service.RedisItemService;
+
 import java.time.Duration;
 
 public class RedisItemCache<T> {
 
-    private final RedisService redisService;
+    private final RedisItemService redisItemService;
     private final Class<T> type;
     private final Duration duration;
 
-    public RedisItemCache(RedisService redisService, Class<T> type, Duration duration) {
-        this.redisService = redisService;
+    public RedisItemCache(RedisItemService redisItemService, Class<T> type, Duration duration) {
+        this.redisItemService = redisItemService;
         this.type = type;
         this.duration = duration;
     }
 
     public T get(String key) {
-        return redisService.get(key, type);
+        return redisItemService.get(key, type);
     }
 
     public void put(String key, T value) {
-        redisService.put(key, value, duration);
+        redisItemService.put(key, value, duration);
     }
 
     public void invalidate(String key) {
-        redisService.evict(key);
+        redisItemService.invalidate(key);
+    }
+
+    public void flushAll() {
+        redisItemService.flushAll();
     }
 }

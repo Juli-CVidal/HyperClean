@@ -1,5 +1,6 @@
 package com.jcv.hyperclean.cache;
 
+import com.jcv.hyperclean.cache.service.RedisItemService;
 import com.jcv.hyperclean.model.Appointment;
 import com.jcv.hyperclean.model.Customer;
 import com.jcv.hyperclean.model.Payment;
@@ -13,17 +14,17 @@ import java.time.Duration;
 
 @Configuration
 public class RedisCacheFactory {
-    private final RedisService redisService;
+    private final RedisItemService redisItemService;
     private final RedisConnectionFactory redisConnectionFactory;
     private static final Duration DEFAULT_EXPIRATION = Duration.ofMinutes(5);
 
-    public RedisCacheFactory(RedisService redisService, RedisConnectionFactory redisConnectionFactory) {
-        this.redisService = redisService;
+    public RedisCacheFactory(RedisItemService redisItemService, RedisConnectionFactory redisConnectionFactory) {
+        this.redisItemService = redisItemService;
         this.redisConnectionFactory = redisConnectionFactory;
     }
 
     private <T> RedisItemCache<T> createCache(Class<T> type, Duration duration) {
-        return new RedisItemCache<>(redisService, type, duration);
+        return new RedisItemCache<>(redisItemService, type, duration);
     }
 
     private <T> RedisItemCache<T> createCache(Class<T> type) {

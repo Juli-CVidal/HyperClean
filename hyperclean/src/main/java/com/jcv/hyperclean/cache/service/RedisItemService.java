@@ -1,4 +1,4 @@
-package com.jcv.hyperclean.cache;
+package com.jcv.hyperclean.cache.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -9,12 +9,12 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class RedisService {
+public class RedisItemService {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
-    public RedisService(RedisTemplate<String, Object> redisTemplate) {
+    public RedisItemService(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
@@ -26,11 +26,15 @@ public class RedisService {
         return type.cast(value);
     }
 
-    public <T> void put(String key, T value, Duration ttl) {
-        redisTemplate.opsForValue().set(key, value, ttl.getSeconds(), TimeUnit.SECONDS);
+    public <T> void put(String key, T value, Duration timeout) {
+        redisTemplate.opsForValue().set(key, value, timeout.getSeconds(), TimeUnit.SECONDS);
     }
 
-    public void evict(String key) {
+    public void invalidate(String key) {
         redisTemplate.delete(key);
+    }
+
+    public void flushAll() {
+        redisTemplate.delete(redisTemplate.keys("*"));
     }
 }
