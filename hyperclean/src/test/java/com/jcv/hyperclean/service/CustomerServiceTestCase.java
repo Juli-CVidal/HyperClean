@@ -23,21 +23,21 @@ class CustomerServiceTestCase extends BaseServiceTest {
         Customer customer = Assertions.assertDoesNotThrow(() -> customerService.create(requestDTO));
         Assertions.assertNotNull(customer);
 
-        assertCustomerFields(customer, name, email, phone);
+        assertFields(customer, name, email, phone);
     }
 
     @Test
     void testBaseCreation() {
         // Base method - no parameters
         Customer customer = createCustomer();
-        assertCustomerHasFields(customer);
+        assertHasFields(customer);
 
         // Complete method
         String name = "testBaseCreation";
         String email = "testBaseCreation@gmail.com";
         String phone = "2612222222";
         customer = createCustomer(name, email, phone);
-        assertCustomerFields(customer, name, email, phone);
+        assertFields(customer, name, email, phone);
     }
 
     @Test
@@ -75,14 +75,14 @@ class CustomerServiceTestCase extends BaseServiceTest {
         Assertions.assertThrows(EntityNotFoundException.class, () -> customerService.findById(1L));
     }
 
-    private void assertCustomerHasFields(Customer customer) {
+    private void assertHasFields(Customer customer) {
         Assertions.assertNotNull(customer.getId(), "Doesn't have id");
         Assertions.assertNotNull(customer.getName(), "Doesn't have name");
         Assertions.assertNotNull(customer.getEmail(), "Doesn't have email");
         Assertions.assertNotNull(customer.getPhone(), "Doesn't have phone");
     }
 
-    private void assertCustomerFields(Customer customer, String name, String email, String phone) {
+    private void assertFields(Customer customer, String name, String email, String phone) {
         Assertions.assertNotNull(customer.getId(), "Doesn't have id");
         Assertions.assertEquals(name, customer.getName(), "Name doesn't match");
         Assertions.assertEquals(email, customer.getEmail(), "Email doesn't match");

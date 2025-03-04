@@ -2,7 +2,6 @@ package com.jcv.hyperclean.service;
 
 import com.jcv.hyperclean.cache.RedisItemCache;
 import com.jcv.hyperclean.cache.RedisListCache;
-import com.jcv.hyperclean.dto.VehicleDTO;
 import com.jcv.hyperclean.dto.request.VehicleRequestDTO;
 import com.jcv.hyperclean.model.Customer;
 import com.jcv.hyperclean.model.Vehicle;
@@ -13,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-
-import static com.jcv.hyperclean.util.ListUtils.mapList;
 
 @Service
 public class VehicleService extends CacheableService<Vehicle> {
@@ -30,11 +27,12 @@ public class VehicleService extends CacheableService<Vehicle> {
 
     @Transactional
     public Vehicle save(Vehicle vehicle) {
+        invalidateListCache(String.valueOf(vehicle.getCustomer().getId()));
         return vehicleRepository.save(vehicle);
     }
 
     @Transactional
-    public VehicleDTO create(VehicleRequestDTO requestDTO) {
+    public Vehicle create(VehicleRequestDTO requestDTO) {
         Customer customer = customerService.findById(requestDTO.getCustomerId());
 
         Vehicle vehicle = Vehicle.of(requestDTO);
@@ -42,7 +40,8 @@ public class VehicleService extends CacheableService<Vehicle> {
 
         vehicle = save(vehicle);
         putInCache(String.valueOf(vehicle.getId()), vehicle);
-        return VehicleDTO.from(vehicle);
+        invalidateListCache(String.valueOf(customer.getId()));
+        return vehicle;
     }
 
     @Transactional(readOnly = true)
@@ -51,23 +50,26 @@ public class VehicleService extends CacheableService<Vehicle> {
     }
 
     @Transactional(readOnly = true)
-    public List<VehicleDTO> findByCustomerId(Long customerId) {
-        List<Vehicle> vehicles = safeFindListBy(customerId, vehicleRepository::findByCustomerId);
-        return mapList(vehicles, VehicleDTO::from);
+    public List<Vehicle> findByCustomerId(Long customerId) {
+        return safeFindListBy(customerId, vehicleRepository::findByCustomerId);
     }
 
     @Transactional
-    public VehicleDTO assignToCustomer(Long id, Long customerId) {
+    public Vehicle assignToCustomer(Long id, Long customerId) {
         Vehicle vehicle = findById(id);
+        Long oldCustomerId = vehicle.getCustomer().getId();
 
         // No changes needed
         if (Objects.equals(vehicle.getCustomer().getId(), customerId)) {
-            return VehicleDTO.from(vehicle);
+            return vehicle;
         }
 
         Customer customer = customerService.findById(customerId);
         vehicle.setCustomer(customer);
+
         invalidateCache(String.valueOf(vehicle.getId()));
-        return VehicleDTO.from(save(vehicle));
+        invalidateListCache(String.valueOf(customerId));
+        invalidateListCache(String.valueOf(oldCustomerId));
+        return save(vehicle);
     }
 }
