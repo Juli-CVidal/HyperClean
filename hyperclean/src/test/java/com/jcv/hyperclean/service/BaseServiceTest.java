@@ -32,6 +32,12 @@ public abstract class BaseServiceTest {
         Customer customer = new Customer();
         customer.setName("John Doe");
         customer.setEmail("johndoe@example.com");
+        customer.setPhone("2612222222");
+        return customerService.save(customer);
+    }
+
+    protected Customer createCustomer(String name, String email, String phone) {
+        Customer customer = Customer.builder().name(name).email(email).phone(phone).build();
         return customerService.save(customer);
     }
 
