@@ -1,5 +1,9 @@
 package com.jcv.hyperclean.service;
 
+import com.jcv.hyperclean.enums.AppointmentStatus;
+import com.jcv.hyperclean.enums.PaymentType;
+import com.jcv.hyperclean.enums.ServiceType;
+import com.jcv.hyperclean.enums.VehicleType;
 import com.jcv.hyperclean.model.Appointment;
 import com.jcv.hyperclean.model.Customer;
 import com.jcv.hyperclean.model.Payment;
@@ -28,37 +32,79 @@ public abstract class BaseServiceTest {
     @Autowired
     protected CustomerService customerService;
 
-    protected Customer createCustomer() {
-        Customer customer = new Customer();
-        customer.setName("John Doe");
-        customer.setEmail("johndoe@example.com");
-        customer.setPhone("2612222222");
-        return customerService.save(customer);
-    }
-
     protected Customer createCustomer(String name, String email, String phone) {
         Customer customer = Customer.builder().name(name).email(email).phone(phone).build();
         return customerService.save(customer);
     }
 
-    protected Vehicle createVehicle(Customer customer) {
-        Vehicle vehicle = new Vehicle();
-        vehicle.setModel("Toyota");
-        vehicle.setCustomer(customer);
+    protected Customer createCustomer() {
+        return createCustomer("Lionel Messi", "lioMessi@example.com", "2612222222");
+    }
+
+    protected Vehicle createVehicle(String model, String licensePlate, Customer customer, VehicleType type) {
+        Vehicle vehicle = Vehicle.builder().model(model).licensePlate(licensePlate).customer(customer).type(type).build();
         return vehicleService.save(vehicle);
     }
 
-    protected Appointment createAppointment(Vehicle vehicle) {
-        Appointment appointment = new Appointment();
-        appointment.setAppointmentDate(LocalDateTime.now());
-        appointment.setVehicle(vehicle);
+    protected Vehicle createVehicle(Customer customer) {
+        return createVehicle("Fitito", "AAA000", customer, VehicleType.SUPERCAR);
+    }
+
+    protected Vehicle createVehicle() {
+        Customer customer = createCustomer();
+        return createVehicle(customer);
+    }
+
+    protected Appointment createAppointment(LocalDateTime date, AppointmentStatus status, ServiceType serviceType, Vehicle vehicle) {
+        Appointment appointment = Appointment.builder().appointmentDate(date).status(status).type(serviceType).vehicle(vehicle).build();
         return appointmentService.save(appointment);
     }
 
-    protected Payment createPayment(Appointment appointment) {
-        Payment payment = new Payment();
-        payment.setAmount(100.0);
-        payment.setAppointment(appointment);
+    protected Appointment createAppointment(Vehicle vehicle) {
+        return createAppointment(LocalDateTime.now(), AppointmentStatus.PENDING, ServiceType.COMPLETE, vehicle);
+    }
+
+    protected Appointment createAppointment(Customer customer) {
+        Vehicle vehicle = createVehicle(customer);
+        return createAppointment(LocalDateTime.now(), AppointmentStatus.PENDING, ServiceType.COMPLETE, vehicle);
+    }
+
+    protected Appointment createAppointment() {
+        Vehicle vehicle = createVehicle();
+        return createAppointment(LocalDateTime.now(), AppointmentStatus.PENDING, ServiceType.COMPLETE, vehicle);
+    }
+
+    protected Payment createPayment(Double amount, LocalDateTime date, Appointment appointment, PaymentType type) {
+        Payment payment = Payment.builder().amount(amount).paymentDate(date).appointment(appointment).type(type).build();
         return paymentService.save(payment);
+    }
+
+    protected Payment createPayment(LocalDateTime date, Appointment appointment, PaymentType type) {
+        Double amount = appointment.getCostOfCleaning();
+        return createPayment(amount, date, appointment, type);
+    }
+
+    protected Payment createPayment(LocalDateTime date, Appointment appointment) {
+        Double amount = appointment.getCostOfCleaning();
+        return createPayment(amount, date, appointment, PaymentType.CASH);
+    }
+
+    protected Payment createPayment(Appointment appointment) {
+        return createPayment(LocalDateTime.now(), appointment, PaymentType.CASH);
+    }
+
+    protected Payment createPayment(Vehicle vehicle) {
+        Appointment appointment = createAppointment(vehicle);
+        return createPayment(LocalDateTime.now(), appointment, PaymentType.CASH);
+    }
+
+    protected Payment createPayment(Customer customer) {
+        Vehicle vehicle = createVehicle(customer);
+        return createPayment(vehicle);
+    }
+
+    protected Payment createPayment() {
+        Customer customer = createCustomer();
+        return createPayment(customer);
     }
 }
