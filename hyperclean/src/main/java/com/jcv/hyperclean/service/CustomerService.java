@@ -6,9 +6,11 @@ import com.jcv.hyperclean.dto.CustomerDTO;
 import com.jcv.hyperclean.dto.request.CustomerRequestDTO;
 import com.jcv.hyperclean.model.Customer;
 import com.jcv.hyperclean.repository.CustomerRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,16 +21,23 @@ import static com.jcv.hyperclean.util.ListUtils.mapList;
 public class CustomerService extends CacheableService<Customer> {
     private static final String ALL_CUSTOMERS_CACHE_KEY = "allCustomers";
     private final CustomerRepository customerRepository;
+    private final Validator validator;
 
     @Autowired
-    public CustomerService(CustomerRepository customerRepository, RedisItemCache<Customer> customerCache, RedisListCache<Customer> customerListCache) {
+    public CustomerService(CustomerRepository customerRepository, RedisItemCache<Customer> customerCache, RedisListCache<Customer> customerListCache, Validator validator) {
         super(customerCache, customerListCache);
         this.customerRepository = customerRepository;
+        this.validator = validator;
     }
 
     @Transactional
-    public CustomerDTO create(CustomerRequestDTO requestDTO) {
-        Customer customer = customerRepository.save(Customer.of(requestDTO));
+    public Customer save(Customer customer) {
+        return customerRepository.save(customer);
+    }
+
+    @Transactional
+    public CustomerDTO create(@Valid CustomerRequestDTO requestDTO) {
+        Customer customer = save(Customer.of(requestDTO));
 
         putInCache(String.valueOf(customer.getId()), customer);
         invalidateListCache(ALL_CUSTOMERS_CACHE_KEY);

@@ -28,6 +28,11 @@ public class PaymentService extends CacheableService<Payment> {
     }
 
     @Transactional
+    public Payment save(Payment payment) {
+        return paymentRepository.save(payment);
+    }
+
+    @Transactional
     public PaymentDTO create(PaymentRequestDTO requestDTO) {
         if (!requestDTO.getType().equals(PaymentType.CASH)) {
             throw new IllegalArgumentException("Currently we only support payment by cash");
@@ -42,7 +47,7 @@ public class PaymentService extends CacheableService<Payment> {
         appointmentService.markAsPaid(appointment);
 
         putInCache(String.valueOf(payment.getId()), payment);
-        return PaymentDTO.from(paymentRepository.save(payment));
+        return PaymentDTO.from(save(payment));
     }
 
     @Transactional(readOnly = true)

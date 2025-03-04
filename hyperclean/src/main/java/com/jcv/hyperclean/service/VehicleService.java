@@ -30,13 +30,18 @@ public class VehicleService extends CacheableService<Vehicle> {
     }
 
     @Transactional
+    public Vehicle save(Vehicle vehicle) {
+        return vehicleRepository.save(vehicle);
+    }
+
+    @Transactional
     public VehicleDTO create(VehicleRequestDTO requestDTO) {
         Customer customer = customerService.findById(requestDTO.getCustomerId());
 
         Vehicle vehicle = Vehicle.of(requestDTO);
         vehicle.setCustomer(customer);
 
-        vehicle = vehicleRepository.save(vehicle);
+        vehicle = save(vehicle);
         putInCache(String.valueOf(vehicle.getId()), vehicle);
         return VehicleDTO.from(vehicle);
     }
@@ -79,6 +84,6 @@ public class VehicleService extends CacheableService<Vehicle> {
         Customer customer = customerService.findById(customerId);
         vehicle.setCustomer(customer);
         invalidateCache(String.valueOf(vehicle.getId()));
-        return VehicleDTO.from(vehicleRepository.save(vehicle));
+        return VehicleDTO.from(save(vehicle));
     }
 }

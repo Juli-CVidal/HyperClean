@@ -30,6 +30,11 @@ public class AppointmentService extends CacheableService<Appointment> {
     }
 
     @Transactional
+    public Appointment save(Appointment appointment) {
+        return appointmentRepository.save(appointment);
+    }
+
+    @Transactional
     public Appointment create(AppointmentRequestDTO requestDTO) {
         Vehicle vehicle = vehicleService.findById(requestDTO.getVehicleId());
         Appointment appointment = Appointment.of(requestDTO);
@@ -39,7 +44,7 @@ public class AppointmentService extends CacheableService<Appointment> {
             appointment.setStatus(AppointmentStatus.PENDING);
         }
 
-        appointment = appointmentRepository.save(appointment);
+        appointment = save(appointment);
         putInCache(String.valueOf(appointment.getId()), appointment);
         return appointment;
     }
