@@ -4,10 +4,10 @@ import com.jcv.hyperclean.model.Appointment;
 import com.jcv.hyperclean.model.Customer;
 import com.jcv.hyperclean.model.Payment;
 import com.jcv.hyperclean.model.Vehicle;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.Duration;
 
@@ -15,13 +15,11 @@ import java.time.Duration;
 public class RedisCacheFactory {
     private final RedisService redisService;
     private final RedisConnectionFactory redisConnectionFactory;
-
     private static final Duration DEFAULT_EXPIRATION = Duration.ofMinutes(5);
 
-    @Autowired
-    public RedisCacheFactory(RedisService redisService, RedisConnectionFactory redisTemplate) {
+    public RedisCacheFactory(RedisService redisService, RedisConnectionFactory redisConnectionFactory) {
         this.redisService = redisService;
-        this.redisConnectionFactory = redisTemplate;
+        this.redisConnectionFactory = redisConnectionFactory;
     }
 
     private <T> RedisItemCache<T> createCache(Class<T> type, Duration duration) {
@@ -32,12 +30,12 @@ public class RedisCacheFactory {
         return createCache(type, DEFAULT_EXPIRATION);
     }
 
-    private <T> RedisListCache<T> createListCache(Class<T> type, Duration duration) {
-        return new RedisListCache<>(redisConnectionFactory, duration);
+    private <T> RedisListCache<T> createListCache(Class<T> type, RedisTemplate<String, T> redisTemplate, Duration duration) {
+        return new RedisListCache<>(redisTemplate, duration);
     }
 
-    private <T> RedisListCache<T> createListCache(Class<T> type) {
-        return createListCache(type, DEFAULT_EXPIRATION);
+    private <T> RedisListCache<T> createListCache(Class<T> type, RedisTemplate<String, T> redisTemplate) {
+        return createListCache(type, redisTemplate, DEFAULT_EXPIRATION);
     }
 
     @Bean
@@ -46,8 +44,8 @@ public class RedisCacheFactory {
     }
 
     @Bean
-    public RedisListCache<Appointment> appointmentListCache() {
-        return createListCache(Appointment.class);
+    public RedisListCache<Appointment> appointmentListCache(RedisTemplate<String, Appointment> redisTemplate) {
+        return createListCache(Appointment.class, redisTemplate);
     }
 
     @Bean
@@ -56,8 +54,8 @@ public class RedisCacheFactory {
     }
 
     @Bean
-    public RedisListCache<Customer> customerListCache() {
-        return createListCache(Customer.class);
+    public RedisListCache<Customer> customerListCache(RedisTemplate<String, Customer> redisTemplate) {
+        return createListCache(Customer.class, redisTemplate);
     }
 
     @Bean
@@ -66,8 +64,8 @@ public class RedisCacheFactory {
     }
 
     @Bean
-    public RedisListCache<Vehicle> vehicleListCache() {
-        return createListCache(Vehicle.class);
+    public RedisListCache<Vehicle> vehicleListCache(RedisTemplate<String, Vehicle> redisTemplate) {
+        return createListCache(Vehicle.class, redisTemplate);
     }
 
     @Bean
@@ -76,7 +74,7 @@ public class RedisCacheFactory {
     }
 
     @Bean
-    public RedisListCache<Payment> paymentListCache() {
-        return createListCache(Payment.class);
+    public RedisListCache<Payment> paymentListCache(RedisTemplate<String, Payment> redisTemplate) {
+        return createListCache(Payment.class, redisTemplate);
     }
 }

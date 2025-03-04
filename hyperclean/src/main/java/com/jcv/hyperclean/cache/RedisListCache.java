@@ -1,10 +1,7 @@
 package com.jcv.hyperclean.cache;
 
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 import java.util.List;
@@ -15,18 +12,9 @@ public class RedisListCache<T> {
     private final RedisTemplate<String, T> redisTemplate;
     private final Duration duration;
 
-    public RedisListCache(RedisConnectionFactory connectionFactory, Duration duration) {
-        this.redisTemplate = setupRedisTemplate(connectionFactory);
+    public RedisListCache(RedisTemplate<String, T> redisTemplate, Duration duration) {
+        this.redisTemplate = redisTemplate;
         this.duration = duration;
-    }
-
-    private RedisTemplate<String, T> setupRedisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, T> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-        template.afterPropertiesSet();
-        return template;
     }
 
     public void set(String cacheKey, List<T> values) {
