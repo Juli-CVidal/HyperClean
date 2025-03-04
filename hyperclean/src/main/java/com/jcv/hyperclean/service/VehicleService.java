@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static com.jcv.hyperclean.util.ListUtils.mapList;
 
@@ -48,27 +47,12 @@ public class VehicleService extends CacheableService<Vehicle> {
 
     @Transactional(readOnly = true)
     public Vehicle findById(Long id) {
-        String cacheKey = String.valueOf(id);
-        Optional<Vehicle> cachedVehicle = getCached(cacheKey);
-        if (cachedVehicle.isPresent()) {
-            return cachedVehicle.get();
-        }
-
-        Vehicle vehicle = vehicleRepository.getReferenceById(id);
-        putInCache(cacheKey, vehicle);
-        return vehicle;
+        return findBy(id, vehicleRepository::findById);
     }
 
     @Transactional(readOnly = true)
     public List<VehicleDTO> findByCustomerId(Long customerId) {
-        String cacheKey = String.valueOf(customerId);
-        Optional<List<Vehicle>> cachedVehicles = getCachedList(cacheKey);
-        if (cachedVehicles.isPresent()) {
-            return mapList(cachedVehicles.get(), VehicleDTO::from);
-        }
-
-        List<Vehicle> vehicles = vehicleRepository.findByCustomerId(customerId);
-        setListCache(cacheKey, vehicles);
+        List<Vehicle> vehicles = safeFindListBy(customerId, vehicleRepository::findByCustomerId);
         return mapList(vehicles, VehicleDTO::from);
     }
 

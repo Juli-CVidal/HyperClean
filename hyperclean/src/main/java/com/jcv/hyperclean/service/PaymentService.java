@@ -12,9 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.function.Function;
-
 @Service
 public class PaymentService extends CacheableService<Payment> {
     private final PaymentRepository paymentRepository;
@@ -52,26 +49,14 @@ public class PaymentService extends CacheableService<Payment> {
 
     @Transactional(readOnly = true)
     public PaymentDTO findById(Long id) {
-        String cacheKey = String.valueOf(id);
-        return findPaymentByKey(cacheKey, id, paymentRepository::getReferenceById);
+        Payment payment = findBy(id,paymentRepository::findById);
+        return PaymentDTO.from(payment);
     }
 
     @Transactional(readOnly = true)
     public PaymentDTO findByAppointmentId(Long appointmentId) {
-        String cacheKey = String.valueOf(appointmentId);
-        return findPaymentByKey(cacheKey, appointmentId, paymentRepository::getReferenceById);
-    }
-
-    private PaymentDTO findPaymentByKey(String cacheKey, Long id, Function<Long, Payment> repositoryMethod) {
-        Optional<Payment> cachedPayment = getCached(cacheKey);
-        if (cachedPayment.isPresent()) {
-            return PaymentDTO.from(cachedPayment.get());
-        }
-
-        Payment payment = repositoryMethod.apply(id);
-        putInCache(cacheKey, payment);
-
-        return PaymentDTO.from(payment);
+        Payment payment = findBy(appointmentId, paymentRepository::findByAppointmentId);
+       return PaymentDTO.from(payment);
     }
 
     private void validatePayment(Payment payment) {

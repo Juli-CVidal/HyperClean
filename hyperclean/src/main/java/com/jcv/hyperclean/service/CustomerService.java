@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Validator;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.jcv.hyperclean.util.ListUtils.mapList;
 
@@ -21,13 +20,11 @@ import static com.jcv.hyperclean.util.ListUtils.mapList;
 public class CustomerService extends CacheableService<Customer> {
     private static final String ALL_CUSTOMERS_CACHE_KEY = "allCustomers";
     private final CustomerRepository customerRepository;
-    private final Validator validator;
 
     @Autowired
     public CustomerService(CustomerRepository customerRepository, RedisItemCache<Customer> customerCache, RedisListCache<Customer> customerListCache, Validator validator) {
         super(customerCache, customerListCache);
         this.customerRepository = customerRepository;
-        this.validator = validator;
     }
 
     @Transactional
@@ -36,36 +33,32 @@ public class CustomerService extends CacheableService<Customer> {
     }
 
     @Transactional
-    public CustomerDTO create(@Valid CustomerRequestDTO requestDTO) {
+    public Customer create(@Valid CustomerRequestDTO requestDTO) {
         Customer customer = save(Customer.of(requestDTO));
 
         putInCache(String.valueOf(customer.getId()), customer);
         invalidateListCache(ALL_CUSTOMERS_CACHE_KEY);
-        return CustomerDTO.from(customer);
-    }
-
-    @Transactional(readOnly = true)
-    public Customer findById(Long id) {
-        String cacheKey = String.valueOf(id);
-        Optional<Customer> cachedCustomer = getCached(cacheKey);
-        if (cachedCustomer.isPresent()) {
-            return cachedCustomer.get();
-        }
-
-        Customer customer = customerRepository.getReferenceById(id);
-        putInCache(cacheKey, customer);
         return customer;
     }
 
     @Transactional(readOnly = true)
-    public List<CustomerDTO> findAll() {
-        Optional<List<Customer>> cachedCustomers = getCachedList(ALL_CUSTOMERS_CACHE_KEY);
-        if (cachedCustomers.isPresent()) {
-            return mapList(cachedCustomers.get(), CustomerDTO::from);
-        }
+    public Customer findById(Long id) {
+        return findBy(id, customerRepository::findById);
+    }
 
-        List<Customer> customers = customerRepository.findAll();
-        setListCache(ALL_CUSTOMERS_CACHE_KEY, customers);
+    @Transactional(readOnly = true)
+    public Customer findByEmail(String email) {
+        return findBy(email, customerRepository::findByEmail);
+    }
+
+    @Transactional(readOnly = true)
+    public Customer findByPhone(String phone) {
+        return findBy(phone, customerRepository::findByPhone);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CustomerDTO> findAll() {
+        List<Customer> customers = safeFindAll(ALL_CUSTOMERS_CACHE_KEY, customerRepository::findAll);
         return mapList(customers, CustomerDTO::from);
     }
 }

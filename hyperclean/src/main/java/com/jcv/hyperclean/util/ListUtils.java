@@ -28,4 +28,8 @@ public class ListUtils {
         return list.stream()
                 .collect(Collectors.toMap(keyMapper, valueMapper));
     }
+
+    public static <T> boolean isEmpty(List<T> list) {
+        return list == null || list.isEmpty();
+    }
 }

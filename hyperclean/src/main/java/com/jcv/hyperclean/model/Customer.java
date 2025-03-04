@@ -2,6 +2,7 @@ package com.jcv.hyperclean.model;
 
 
 import com.jcv.hyperclean.dto.request.CustomerRequestDTO;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.validation.Valid;
@@ -18,7 +19,11 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "customer")
 public class Customer extends BasicModel {
     private String name;
+
+    @Column(unique = true)
     private String email;
+
+    @Column(unique = true)
     private String phone;
 
     public static Customer of(@Valid CustomerRequestDTO customerDTO) {

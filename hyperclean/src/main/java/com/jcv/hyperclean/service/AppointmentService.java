@@ -51,15 +51,7 @@ public class AppointmentService extends CacheableService<Appointment> {
 
     @Transactional(readOnly = true)
     public Appointment findById(Long id) {
-        String cacheKey = String.valueOf(id);
-        Optional<Appointment> cachedAppointment = getCached(cacheKey);
-        if (cachedAppointment.isPresent()) {
-            return cachedAppointment.get();
-        }
-
-        Appointment appointment = appointmentRepository.getReferenceById(id);
-        putInCache(cacheKey, appointment);
-        return appointment;
+        return findBy(id, appointmentRepository::findById);
     }
 
     @Transactional(readOnly = true)
