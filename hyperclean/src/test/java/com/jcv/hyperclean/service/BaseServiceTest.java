@@ -14,6 +14,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Random;
+import java.util.UUID;
 
 @Rollback
 @Transactional
@@ -38,7 +40,9 @@ public abstract class BaseServiceTest {
     }
 
     protected Customer createCustomer() {
-        return createCustomer("Lionel Messi", "lioMessi@example.com", "2612222222");
+        String email = String.format("lioMessi+%s@gmail.com", UUID.randomUUID());
+        String phoneNumber = "261" + String.format("%05d", new Random().nextInt(100000));
+        return createCustomer("Lionel Messi", email, phoneNumber);
     }
 
     protected Vehicle createVehicle(String model, String licensePlate, Customer customer, VehicleType type) {
@@ -60,6 +64,10 @@ public abstract class BaseServiceTest {
         return appointmentService.save(appointment);
     }
 
+    protected Appointment createAppointment(Vehicle vehicle, LocalDateTime date) {
+        return createAppointment(date, AppointmentStatus.PENDING, ServiceType.COMPLETE, vehicle);
+    }
+
     protected Appointment createAppointment(Vehicle vehicle) {
         return createAppointment(LocalDateTime.now(), AppointmentStatus.PENDING, ServiceType.COMPLETE, vehicle);
     }
@@ -72,6 +80,11 @@ public abstract class BaseServiceTest {
     protected Appointment createAppointment() {
         Vehicle vehicle = createVehicle();
         return createAppointment(LocalDateTime.now(), AppointmentStatus.PENDING, ServiceType.COMPLETE, vehicle);
+    }
+
+    protected Appointment createAppointment(LocalDateTime date) {
+        Vehicle vehicle = createVehicle();
+        return createAppointment(date, AppointmentStatus.PENDING, ServiceType.COMPLETE, vehicle);
     }
 
     protected Payment createPayment(Double amount, LocalDateTime date, Appointment appointment, PaymentType type) {

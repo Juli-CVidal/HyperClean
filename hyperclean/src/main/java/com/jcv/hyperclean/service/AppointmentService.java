@@ -13,9 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
-
-import static com.jcv.hyperclean.util.ListUtils.mapList;
 
 @Service
 public class AppointmentService extends CacheableService<Appointment> {
@@ -31,6 +28,7 @@ public class AppointmentService extends CacheableService<Appointment> {
 
     @Transactional
     public Appointment save(Appointment appointment) {
+        invalidateCache(String.valueOf(appointment.getId()));
         return appointmentRepository.save(appointment);
     }
 
@@ -39,10 +37,6 @@ public class AppointmentService extends CacheableService<Appointment> {
         Vehicle vehicle = vehicleService.findById(requestDTO.getVehicleId());
         Appointment appointment = Appointment.of(requestDTO);
         appointment.setVehicle(vehicle);
-
-        if (appointment.getStatus() == null) {
-            appointment.setStatus(AppointmentStatus.PENDING);
-        }
 
         appointment = save(appointment);
         putInCache(String.valueOf(appointment.getId()), appointment);
@@ -55,23 +49,15 @@ public class AppointmentService extends CacheableService<Appointment> {
     }
 
     @Transactional(readOnly = true)
-    public List<AppointmentDTO> findByVehicleId(Long vehicleId) {
-        String cacheKey = String.valueOf(vehicleId);
-        Optional<List<Appointment>> cachedAppointments = getCachedList(cacheKey);
-        if (cachedAppointments.isPresent()) {
-            return mapList(cachedAppointments.get(), AppointmentDTO::from);
-        }
-
-        List<Appointment> appointments = appointmentRepository.findByVehicleId(vehicleId);
-        setListCache(cacheKey, appointments);
-        return mapList(appointments, AppointmentDTO::from);
+    public List<Appointment> findByVehicleId(Long vehicleId) {
+        return findListBy(vehicleId, appointmentRepository::findByVehicleId);
     }
 
     @Transactional
     public AppointmentDTO markAsInProgress(Long id) {
         Appointment appointment = findById(id);
         if (!appointment.isPending()) {
-            throw new IllegalArgumentException("Appointment is not in pending state");
+            throw new IllegalStateException("Appointment is not in pending state");
         }
 
         return updateStatusAndSave(appointment, AppointmentStatus.IN_PROGRESS);
@@ -97,17 +83,18 @@ public class AppointmentService extends CacheableService<Appointment> {
     private AppointmentDTO updateStatusAndSave(Appointment appointment, AppointmentStatus status) {
         appointment.setStatus(status);
         appointmentRepository.save(appointment);
+        invalidateListCache(String.valueOf(appointment.getVehicle().getId()));
         invalidateCache(String.valueOf(appointment.getId()));
         return AppointmentDTO.from(appointment);
     }
 
     private void validateApplicableForPayment(Appointment appointment) {
         if (appointment.wasPaid()) {
-            throw new IllegalArgumentException("Appointment already paid");
+            throw new IllegalStateException("Appointment already paid");
         }
 
         if (!appointment.isApplicableForPayment()) {
-            throw new IllegalArgumentException("Appointment is not applicable for payment");
+            throw new IllegalStateException("Appointment is not applicable for payment");
         }
     }
 }

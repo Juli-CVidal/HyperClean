@@ -10,6 +10,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -33,7 +34,7 @@ public class Appointment extends BasicModel {
     public static Appointment of(AppointmentRequestDTO requestDTO) {
         return Appointment.builder()
                 .appointmentDate(requestDTO.getAppointmentDate())
-                .status(requestDTO.getStatus())
+                .status(Optional.ofNullable(requestDTO.getStatus()).orElse(AppointmentStatus.PENDING))
                 .type(requestDTO.getType())
                 .build();
     }
@@ -55,10 +56,6 @@ public class Appointment extends BasicModel {
     }
 
     public boolean hasFinished() {
-        if (isInProgress()) {
-            return false;
-        }
-
         LocalDateTime timeOfFinish = appointmentDate.plusMinutes(getCleaningTime());
         return LocalDateTime.now().isAfter(timeOfFinish);
     }

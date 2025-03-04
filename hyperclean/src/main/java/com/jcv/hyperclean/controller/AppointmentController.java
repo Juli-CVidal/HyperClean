@@ -2,6 +2,7 @@ package com.jcv.hyperclean.controller;
 
 import com.jcv.hyperclean.dto.AppointmentDTO;
 import com.jcv.hyperclean.dto.request.AppointmentRequestDTO;
+import com.jcv.hyperclean.model.Appointment;
 import com.jcv.hyperclean.service.AppointmentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static com.jcv.hyperclean.util.ListUtils.mapList;
 
 @RestController
 @RequestMapping("/api/v1/appointment")
@@ -32,7 +35,8 @@ public class AppointmentController {
 
     @GetMapping("/by-vehicle/{vehicleId}")
     public ResponseEntity<List<AppointmentDTO>> getByVehicle(@PathVariable Long vehicleId) {
-        return ResponseEntity.ok(appointmentService.findByVehicleId(vehicleId));
+        List<Appointment> appointments = appointmentService.findByVehicleId(vehicleId);
+        return ResponseEntity.ok(mapList(appointments, AppointmentDTO::from));
     }
 
     @PatchMapping("/{id}/mark-as-in-progress")
