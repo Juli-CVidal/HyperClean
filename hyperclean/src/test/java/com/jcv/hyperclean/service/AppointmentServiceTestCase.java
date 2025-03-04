@@ -10,10 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,22 +19,13 @@ import java.util.Set;
 import static com.jcv.hyperclean.util.ListUtils.mapList;
 import static com.jcv.hyperclean.util.SetUtils.listToSet;
 
-@Rollback
-@Transactional
 @SpringBootTest
 class AppointmentServiceTestCase extends BaseServiceTest {
     private Vehicle vehicle;
-    @Autowired
-    private AppointmentService appointmentService;
 
     @BeforeEach
     void setUp() {
         vehicle = createVehicle();
-    }
-
-    @BeforeEach
-    void tearDown() {
-        appointmentService.flushCaches();
     }
 
     @Test

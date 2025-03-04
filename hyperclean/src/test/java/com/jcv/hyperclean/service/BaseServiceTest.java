@@ -8,6 +8,7 @@ import com.jcv.hyperclean.model.Appointment;
 import com.jcv.hyperclean.model.Customer;
 import com.jcv.hyperclean.model.Payment;
 import com.jcv.hyperclean.model.Vehicle;
+import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
@@ -33,6 +34,14 @@ public abstract class BaseServiceTest {
 
     @Autowired
     protected CustomerService customerService;
+
+    @AfterEach
+    void clearCaches() {
+        appointmentService.flushCaches();
+        customerService.flushCaches();
+        paymentService.flushCaches();
+        vehicleService.flushCaches();
+    }
 
     protected Customer createCustomer(String name, String email, String phone) {
         Customer customer = Customer.builder().name(name).email(email).phone(phone).build();
@@ -89,6 +98,8 @@ public abstract class BaseServiceTest {
 
     protected Payment createPayment(Double amount, LocalDateTime date, Appointment appointment, PaymentType type) {
         Payment payment = Payment.builder().amount(amount).paymentDate(date).appointment(appointment).type(type).build();
+        appointment.setStatus(AppointmentStatus.PAID);
+        appointmentService.save(appointment);
         return paymentService.save(payment);
     }
 
@@ -106,18 +117,14 @@ public abstract class BaseServiceTest {
         return createPayment(LocalDateTime.now(), appointment, PaymentType.CASH);
     }
 
-    protected Payment createPayment(Vehicle vehicle) {
-        Appointment appointment = createAppointment(vehicle);
-        return createPayment(LocalDateTime.now(), appointment, PaymentType.CASH);
-    }
-
-    protected Payment createPayment(Customer customer) {
+    protected Payment createPayment(LocalDateTime date) {
+        Customer customer = createCustomer();
         Vehicle vehicle = createVehicle(customer);
-        return createPayment(vehicle);
+        Appointment appointment = createAppointment(vehicle);
+        return createPayment(date, appointment);
     }
 
     protected Payment createPayment() {
-        Customer customer = createCustomer();
-        return createPayment(customer);
+        return createPayment(LocalDateTime.now());
     }
 }

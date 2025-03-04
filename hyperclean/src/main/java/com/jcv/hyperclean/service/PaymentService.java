@@ -30,7 +30,7 @@ public class PaymentService extends CacheableService<Payment> {
     }
 
     @Transactional
-    public PaymentDTO create(PaymentRequestDTO requestDTO) {
+    public Payment create(PaymentRequestDTO requestDTO) {
         if (!requestDTO.getType().equals(PaymentType.CASH)) {
             throw new IllegalArgumentException("Currently we only support payment by cash");
         }
@@ -44,7 +44,7 @@ public class PaymentService extends CacheableService<Payment> {
         appointmentService.markAsPaid(appointment);
 
         putInCache(String.valueOf(payment.getId()), payment);
-        return PaymentDTO.from(save(payment));
+        return save(payment);
     }
 
     @Transactional(readOnly = true)
@@ -64,7 +64,7 @@ public class PaymentService extends CacheableService<Payment> {
         Double costOfCleaning = appointment.getCostOfCleaning();
 
         if (costOfCleaning > payment.getAmount()) {
-            throw new IllegalArgumentException("Payment amount is less than the cost of cleaning");
+            throw new IllegalStateException("Payment amount is less than the cost of cleaning");
         }
     }
 }

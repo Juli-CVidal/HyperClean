@@ -20,7 +20,7 @@ public class PaymentController {
 
     @PostMapping
     public ResponseEntity<PaymentDTO> create(@Valid @RequestBody PaymentRequestDTO requestDTO) {
-        return ResponseEntity.ok(paymentService.create(requestDTO));
+        return ResponseEntity.ok(PaymentDTO.from(paymentService.create(requestDTO)));
     }
 
     @GetMapping("/{id}")

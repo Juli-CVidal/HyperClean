@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Table(name = "payment")
 public class Payment extends BasicModel {
-
     private Double amount;
     private LocalDateTime paymentDate;
 
