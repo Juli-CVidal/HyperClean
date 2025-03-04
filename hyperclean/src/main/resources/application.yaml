@@ -10,8 +10,8 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: update
+
   data:
     redis:
-      host: localhost
+      host: host.docker.internal
       port: 6379
-      timeout: 60000
