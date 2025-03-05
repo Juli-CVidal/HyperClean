@@ -5,11 +5,14 @@ import com.jcv.hyperclean.cache.RedisListCache;
 import com.jcv.hyperclean.model.BasicModel;
 import com.jcv.hyperclean.util.ListUtils;
 import jakarta.persistence.EntityNotFoundException;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static com.jcv.hyperclean.util.ListUtils.mapList;
 
 public abstract class CacheableService<T extends BasicModel> {
     private final RedisItemCache<T> cache;
@@ -110,10 +113,17 @@ public abstract class CacheableService<T extends BasicModel> {
         return getCachedList(key).orElseGet(() -> {
             List<T> items = repositoryMethod.apply(key);
             if (!items.isEmpty()) {
-                setListCache(key, items);
+                setListCache(key, mapList(items, this::convertToPlainObject));
             }
             return items;
         });
+    }
+
+    public <T> T convertToPlainObject(T entity) {
+        if (entity instanceof HibernateProxy) {
+            return (T) ((HibernateProxy) entity).getHibernateLazyInitializer().getImplementation();
+        }
+        return entity;
     }
 
     protected List<T> safeFindListBy(Long key, Function<Long, List<T>> repositoryMethod) {

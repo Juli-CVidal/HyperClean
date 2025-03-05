@@ -1,5 +1,6 @@
 package com.jcv.hyperclean.cache;
 
+import com.jcv.hyperclean.util.RedisUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.Duration;
@@ -9,10 +10,12 @@ import java.util.concurrent.TimeUnit;
 public class RedisItemCache<T> {
     private final RedisTemplate<String, T> redisTemplate;
     private final Duration duration;
+    private final Class<T> clazz;
 
-    public RedisItemCache(RedisTemplate<String, T> redisTemplate, Duration duration) {
+    public RedisItemCache(RedisTemplate<String, T> redisTemplate, Duration duration, Class<T> clazz) {
         this.redisTemplate = redisTemplate;
         this.duration = duration;
+        this.clazz = clazz;
     }
 
     public T get(String key) {
@@ -20,7 +23,7 @@ public class RedisItemCache<T> {
         if (Objects.isNull(value)) {
             return null;
         }
-        return value;
+        return RedisUtils.convertFromMap(value, clazz);
     }
 
     public void put(String key, T value) {
