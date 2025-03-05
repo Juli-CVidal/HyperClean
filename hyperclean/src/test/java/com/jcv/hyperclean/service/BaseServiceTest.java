@@ -12,6 +12,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @Rollback
 @Transactional
 @SpringBootTest
+@ActiveProfiles("test")
 public abstract class BaseServiceTest {
 
     @Autowired
@@ -50,8 +52,12 @@ public abstract class BaseServiceTest {
 
     protected Customer createCustomer() {
         String email = String.format("lioMessi+%s@gmail.com", UUID.randomUUID());
-        String phoneNumber = "261" + String.format("%05d", new Random().nextInt(100000));
+        String phoneNumber = getRandomNumber();
         return createCustomer("Lionel Messi", email, phoneNumber);
+    }
+
+    protected String getRandomNumber() {
+        return "261" + String.format("%05d", new Random().nextInt(100000));
     }
 
     protected Vehicle createVehicle(String model, String licensePlate, Customer customer, VehicleType type) {

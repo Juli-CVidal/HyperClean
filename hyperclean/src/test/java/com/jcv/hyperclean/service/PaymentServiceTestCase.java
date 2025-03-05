@@ -21,7 +21,7 @@ public class PaymentServiceTestCase extends BaseServiceTest {
     }
 
     @Test
-    void testCreateAppointment() {
+    void testCreatePayment() {
         Double amount = 0D;
         LocalDateTime date = LocalDateTime.now();
         PaymentType type = PaymentType.DEBIT;

@@ -7,6 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 
 import java.util.List;
 
@@ -14,10 +15,11 @@ import java.util.List;
 class CustomerServiceTestCase extends BaseServiceTest {
 
     @Test
+    @Rollback
     void testCreateCustomer() {
         String name = "testCreateCustomer";
         String email = "testCreateCustomer@gmail.com";
-        String phone = "2612222222";
+        String phone = getRandomNumber();
         CustomerRequestDTO requestDTO = new CustomerRequestDTO(name, email, phone);
 
         Customer customer = Assertions.assertDoesNotThrow(() -> customerService.create(requestDTO));
@@ -35,7 +37,7 @@ class CustomerServiceTestCase extends BaseServiceTest {
         // Complete method
         String name = "testBaseCreation";
         String email = "testBaseCreation@gmail.com";
-        String phone = "2612222222";
+        String phone = getRandomNumber();
         customer = createCustomer(name, email, phone);
         assertFields(customer, name, email, phone);
     }
