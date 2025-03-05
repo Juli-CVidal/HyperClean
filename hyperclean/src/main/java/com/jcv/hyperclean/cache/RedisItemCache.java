@@ -1,34 +1,37 @@
 package com.jcv.hyperclean.cache;
 
-import com.jcv.hyperclean.cache.service.RedisItemService;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.Duration;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class RedisItemCache<T> {
-
-    private final RedisItemService redisItemService;
-    private final Class<T> type;
+    private final RedisTemplate<String, T> redisTemplate;
     private final Duration duration;
 
-    public RedisItemCache(RedisItemService redisItemService, Class<T> type, Duration duration) {
-        this.redisItemService = redisItemService;
-        this.type = type;
+    public RedisItemCache(RedisTemplate<String, T> redisTemplate, Duration duration) {
+        this.redisTemplate = redisTemplate;
         this.duration = duration;
     }
 
     public T get(String key) {
-        return redisItemService.get(key, type);
+        T value = redisTemplate.opsForValue().get(key);
+        if (Objects.isNull(value)) {
+            return null;
+        }
+        return value;
     }
 
     public void put(String key, T value) {
-        redisItemService.put(key, value, duration);
+        redisTemplate.opsForValue().set(key, value, duration.getSeconds(), TimeUnit.SECONDS);
     }
 
     public void invalidate(String key) {
-        redisItemService.invalidate(key);
+        redisTemplate.delete(key);
     }
 
     public void flushAll() {
-        redisItemService.flushAll();
+        redisTemplate.delete(redisTemplate.keys("*"));
     }
 }
