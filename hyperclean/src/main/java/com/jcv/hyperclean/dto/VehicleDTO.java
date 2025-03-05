@@ -14,25 +14,15 @@ import lombok.experimental.SuperBuilder;
 public class VehicleDTO extends BasicDTO {
     private String model;
     private String licensePlate;
-    private CustomerDTO customer;
+    private Long customerId;
     private VehicleType type;
 
     public static VehicleDTO from(Vehicle vehicle) {
         return VehicleDTO.builder()
                 .id(vehicle.getId())
                 .licensePlate(vehicle.getLicensePlate())
-                .customer(CustomerDTO.from(vehicle.getCustomer()))
+                .customerId(vehicle.getCustomer().getId())
                 .type(vehicle.getType())
-                .build();
-    }
-
-    public Vehicle toModel() {
-        return Vehicle.builder()
-                .id(this.id)
-                .model(this.model)
-                .licensePlate(this.licensePlate)
-                .customer(this.customer.toModel())
-                .type(this.type)
                 .build();
     }
 }

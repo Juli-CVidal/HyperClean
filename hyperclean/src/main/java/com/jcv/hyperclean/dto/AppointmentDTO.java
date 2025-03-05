@@ -17,7 +17,7 @@ public class AppointmentDTO extends BasicDTO {
     private LocalDateTime appointmentDate;
     private AppointmentStatus status;
     private ServiceType type;
-    private VehicleDTO vehicle;
+    private Long vehicleId;
 
     public static AppointmentDTO from(Appointment appointment) {
         return AppointmentDTO.builder()
@@ -25,17 +25,7 @@ public class AppointmentDTO extends BasicDTO {
                 .appointmentDate(appointment.getAppointmentDate())
                 .status(appointment.getStatus())
                 .type(appointment.getType())
-                .vehicle(VehicleDTO.from(appointment.getVehicle()))
-                .build();
-    }
-
-    public Appointment toModel() {
-        return Appointment.builder()
-                .id(this.id)
-                .appointmentDate(this.appointmentDate)
-                .status(this.status)
-                .type(this.type)
-                .vehicle(this.vehicle.toModel())
+                .vehicleId(appointment.getVehicle().getId())
                 .build();
     }
 }

@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class PaymentDTO extends BasicDTO {
     private Double amount;
     private LocalDateTime paymentDate;
-    private AppointmentDTO appointment;
+    private Long appointmentId;
     private PaymentType type;
 
 
@@ -26,17 +26,7 @@ public class PaymentDTO extends BasicDTO {
                 .amount(payment.getAmount())
                 .paymentDate(payment.getPaymentDate())
                 .type(payment.getType())
-                .appointment(AppointmentDTO.from(payment.getAppointment()))
-                .build();
-    }
-
-    public Payment toModel() {
-        return Payment.builder()
-                .id(this.id)
-                .amount(this.amount)
-                .paymentDate(this.paymentDate)
-                .type(this.type)
-                .appointment(this.appointment.toModel())
+                .appointmentId(payment.getAppointment().getId())
                 .build();
     }
 }
