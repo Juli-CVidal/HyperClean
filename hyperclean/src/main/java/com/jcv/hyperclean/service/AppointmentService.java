@@ -7,6 +7,7 @@ import com.jcv.hyperclean.dto.request.AppointmentRequestDTO;
 import com.jcv.hyperclean.enums.AppointmentStatus;
 import com.jcv.hyperclean.exception.HCInvalidDateTimeFormat;
 import com.jcv.hyperclean.exception.HCValidationFailedException;
+import com.jcv.hyperclean.exception.HCVehicleTimeSlotOccupiedException;
 import com.jcv.hyperclean.model.Appointment;
 import com.jcv.hyperclean.model.Vehicle;
 import com.jcv.hyperclean.repository.AppointmentRepository;
@@ -16,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.jcv.hyperclean.util.ListUtils.filterList;
 
 @Service
 public class AppointmentService extends CacheableService<Appointment> {
@@ -32,11 +35,13 @@ public class AppointmentService extends CacheableService<Appointment> {
     @Transactional
     public Appointment save(Appointment appointment) {
         invalidateCache(appointment.getId());
+        appointment = appointmentRepository.save(appointment);
+        putInCache(appointment.getId(), appointment);
         return appointmentRepository.save(appointment);
     }
 
     @Transactional
-    public Appointment create(AppointmentRequestDTO requestDTO) throws HCValidationFailedException, HCInvalidDateTimeFormat {
+    public Appointment create(AppointmentRequestDTO requestDTO) throws HCValidationFailedException, HCInvalidDateTimeFormat, HCVehicleTimeSlotOccupiedException {
         Vehicle vehicle = vehicleService.findById(requestDTO.getVehicleId());
         Appointment appointment = Appointment.of(requestDTO);
         if (appointment.getAppointmentDate().isBefore(LocalDateTime.now())) {
@@ -45,9 +50,8 @@ public class AppointmentService extends CacheableService<Appointment> {
 
         appointment.setVehicle(vehicle);
 
-        appointment = save(appointment);
-        putInCache(appointment.getId(), appointment);
-        return appointment;
+        validateVehicleAvailableForAppointment(appointment);
+        return save(appointment);
     }
 
     @Transactional(readOnly = true)
@@ -103,5 +107,38 @@ public class AppointmentService extends CacheableService<Appointment> {
         if (!appointment.isApplicableForPayment()) {
             throw new HCValidationFailedException("Appointment is not applicable for payment");
         }
+    }
+
+    /**
+     * Verifies if the appointment will collide with another scheduled appointments
+     * @param appointment the new appointment
+     * @throws HCVehicleTimeSlotOccupiedException if the requested time slot has been claimed by other appointment for the same vehicle
+     */
+    private void validateVehicleAvailableForAppointment(Appointment appointment) throws HCVehicleTimeSlotOccupiedException {
+        Vehicle vehicle = appointment.getVehicle();
+        List<Appointment> appointments = findListBy(vehicle.getId(), appointmentRepository::findByVehicleId);
+        appointments = filterList(appointments, scheduled -> isAvailableForAppointment(scheduled, appointment.getAppointmentDate()));
+
+        if (!appointments.isEmpty()) {
+            throw new HCVehicleTimeSlotOccupiedException();
+        }
+    }
+
+    /**
+     * Checks if the expected date will collide with a saved appointment
+     * @param appointment the saved appointment
+     * @param expectedDate the date to program the new appointment
+     * @return if the vehicle will be available for the new appointment
+     */
+    private boolean isAvailableForAppointment(Appointment appointment, LocalDateTime expectedDate) {
+        boolean isCompleted = List.of(AppointmentStatus.FINISHED, AppointmentStatus.PAID).contains(appointment.getStatus());
+        if (isCompleted) {
+            return true;
+        }
+
+        LocalDateTime appointmentDate = appointment.getAppointmentDate();
+        LocalDateTime timeOfFinish = appointmentDate.plusMinutes(appointment.getCleaningTime());
+        boolean isOccupied = expectedDate.isBefore(timeOfFinish) && expectedDate.isAfter(appointmentDate);
+        return !isOccupied;
     }
 }

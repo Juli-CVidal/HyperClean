@@ -1,10 +1,12 @@
 package com.jcv.hyperclean.controller;
 
 import com.jcv.hyperclean.exception.HCValidationFailedException;
+import com.jcv.hyperclean.exception.HCVehicleTimeSlotOccupiedException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -55,8 +57,20 @@ public class BaseControllerAdvice {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({HCValidationFailedException.class})
-    public ResponseEntity<String> handleIllegalArgumentAndStateException(IllegalArgumentException ex) {
+    public ResponseEntity<String> handleIllegalArgumentAndStateException(HCValidationFailedException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({HCVehicleTimeSlotOccupiedException.class})
+    public ResponseEntity<String> handleHCVehicleTimeSlotOccupiedException(HCVehicleTimeSlotOccupiedException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({HttpMessageNotReadableException.class})
+    public ResponseEntity<String> handleMessageNotReadableException() {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The request body is invalid. Please review it and try again.");
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

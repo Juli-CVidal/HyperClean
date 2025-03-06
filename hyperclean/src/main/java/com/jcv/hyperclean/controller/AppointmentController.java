@@ -4,6 +4,7 @@ import com.jcv.hyperclean.dto.AppointmentDTO;
 import com.jcv.hyperclean.dto.request.AppointmentRequestDTO;
 import com.jcv.hyperclean.exception.HCInvalidDateTimeFormat;
 import com.jcv.hyperclean.exception.HCValidationFailedException;
+import com.jcv.hyperclean.exception.HCVehicleTimeSlotOccupiedException;
 import com.jcv.hyperclean.model.Appointment;
 import com.jcv.hyperclean.service.AppointmentService;
 import jakarta.validation.Valid;
@@ -26,7 +27,7 @@ public class AppointmentController {
     }
 
     @PostMapping
-    public ResponseEntity<AppointmentDTO> create(@Valid @RequestBody AppointmentRequestDTO requestDTO) throws HCInvalidDateTimeFormat, HCValidationFailedException {
+    public ResponseEntity<AppointmentDTO> create(@Valid @RequestBody AppointmentRequestDTO requestDTO) throws HCInvalidDateTimeFormat, HCValidationFailedException, HCVehicleTimeSlotOccupiedException {
         return ResponseEntity.ok(AppointmentDTO.from(appointmentService.create(requestDTO)));
     }
 
@@ -41,12 +42,12 @@ public class AppointmentController {
         return ResponseEntity.ok(mapList(appointments, AppointmentDTO::from));
     }
 
-    @PatchMapping("/{id}/mark-as-in-progress")
+    @PutMapping("/{id}/mark-as-in-progress")
     public ResponseEntity<AppointmentDTO> markAsInProgress(@PathVariable Long id) throws HCValidationFailedException {
         return ResponseEntity.ok(appointmentService.markAsInProgress(id));
     }
 
-    @PatchMapping("/{id}/mark-as-finished")
+    @PutMapping("/{id}/mark-as-finished")
     public ResponseEntity<AppointmentDTO> markAsFinished(@PathVariable Long id) throws HCValidationFailedException {
         return ResponseEntity.ok(appointmentService.markAsFinished(id));
     }
