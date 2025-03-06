@@ -29,9 +29,11 @@ The API is divided into four categories, CUSTOMER, VEHICLE, APPOINTMENT, PAYMENT
 
 --------------
 # The endpoints
-> Want to try it by yourself? Import `HyperClean.postman_collection.json` to your environment
-# Customer (api/v1/customer)
+![Postman collection](docs/images/endpoints.png)
 
+> Wanna try it yourself? [Download HyperClean.postman_collection.json](https://github.com/Juli-CVidal/HyperClean/blob/main/docs/HyperClean.postman_collection.json)
+
+# Customer (api/v1/customer)
 ## POST(/)
  Allows the creation of a customer
 
@@ -113,11 +115,11 @@ Searches for an appointment using id
 Searches for appointments of a vehicle
 ![GET appointments by vehicleId](/docs/images/appointment/get-by-vehicle-id.png)
 
-## PATCH (/{id}/mark-as-in-progress)
+## PUT (/{id}/mark-as-in-progress)
 Allows to mark an appointment as in progress
 ![PUT mark as in progress](/docs/images/appointment/mark-as-in-progress.png)
 
-## PATCH (/{id}/mark-as-in-finished)
+## PUT (/{id}/mark-as-finished)
 Allows to mark an appointment as finished
 ![PUT mark as in progress](/docs/images/appointment/mark-as-finished.png)
 
