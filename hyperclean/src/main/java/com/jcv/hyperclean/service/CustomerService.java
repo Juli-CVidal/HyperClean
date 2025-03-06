@@ -29,6 +29,7 @@ public class CustomerService extends CacheableService<Customer> {
 
     @Transactional
     public Customer save(Customer customer) {
+        invalidateListCache(ALL_CUSTOMERS_CACHE_KEY);
         return customerRepository.save(customer);
     }
 
@@ -37,7 +38,6 @@ public class CustomerService extends CacheableService<Customer> {
         Customer customer = save(Customer.of(requestDTO));
 
         putInCache(customer.getId(), customer);
-        invalidateListCache(ALL_CUSTOMERS_CACHE_KEY);
         return customer;
     }
 

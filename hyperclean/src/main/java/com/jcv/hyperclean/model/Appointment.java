@@ -1,5 +1,6 @@
 package com.jcv.hyperclean.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jcv.hyperclean.dto.request.AppointmentRequestDTO;
 import com.jcv.hyperclean.enums.AppointmentStatus;
 import com.jcv.hyperclean.enums.ServiceType;
@@ -29,6 +30,7 @@ public class Appointment extends BasicModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Vehicle vehicle;
 
     public static Appointment of(AppointmentRequestDTO requestDTO) {

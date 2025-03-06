@@ -1,6 +1,6 @@
 package com.jcv.hyperclean.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jcv.hyperclean.dto.request.PaymentRequestDTO;
 import com.jcv.hyperclean.enums.PaymentType;
 import jakarta.persistence.*;
@@ -23,7 +23,7 @@ public class Payment extends BasicModel {
 
     @OneToOne
     @JoinColumn(name = "appointment_id")
-    @JsonIgnore
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Appointment appointment;
 
     @Enumerated(EnumType.STRING)

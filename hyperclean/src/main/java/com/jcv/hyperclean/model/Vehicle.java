@@ -1,6 +1,6 @@
 package com.jcv.hyperclean.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jcv.hyperclean.dto.request.VehicleRequestDTO;
 import com.jcv.hyperclean.enums.VehicleType;
 import jakarta.persistence.*;
@@ -23,7 +23,7 @@ public class Vehicle extends BasicModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
-    @JsonIgnore
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Customer customer;
 
     @Enumerated(EnumType.STRING)
