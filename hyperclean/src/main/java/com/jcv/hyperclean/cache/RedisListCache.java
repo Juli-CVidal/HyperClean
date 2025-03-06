@@ -24,32 +24,36 @@ public class RedisListCache<T> {
         this.clazz = clazz;
     }
 
-    public void set(String cacheKey, List<T> values) {
-        redisTemplate.delete(cacheKey);
-        redisTemplate.opsForList().rightPushAll(cacheKey, values);
-        redisTemplate.expire(cacheKey, duration.getSeconds(), TimeUnit.SECONDS);
+    public void set(String key, List<T> values) {
+        redisTemplate.delete(formatKey(key));
+        redisTemplate.opsForList().rightPushAll(formatKey(key), values);
+        redisTemplate.expire(formatKey(key), duration.getSeconds(), TimeUnit.SECONDS);
     }
 
-    public void add(String cacheKey, T value) {
+    public void add(String key, T value) {
         ListOperations<String, T> listOps = redisTemplate.opsForList();
-        listOps.rightPush(cacheKey, value);
-        redisTemplate.expire(cacheKey, duration.getSeconds(), TimeUnit.SECONDS);
+        listOps.rightPush(formatKey(key), value);
+        redisTemplate.expire(formatKey(key), duration.getSeconds(), TimeUnit.SECONDS);
     }
 
-    public List<T> get(String cacheKey) {
+    public List<T> get(String key) {
         ListOperations<String, T> listOps = redisTemplate.opsForList();
-        List<T> list = listOps.range(cacheKey, 0, -1);
+        List<T> list = listOps.range(formatKey(key), 0, -1);
         if (!ListUtils.isEmpty(list)) {
             return mapList(list, value ->RedisUtils.convertFromMap(value, clazz));
         }
         return new ArrayList<>();
     }
 
-    public void invalidate(String cacheKey) {
-        redisTemplate.delete(cacheKey);
+    public void invalidate(String key) {
+        redisTemplate.delete(formatKey(key));
     }
 
     public void flushAll() {
         redisTemplate.delete(redisTemplate.keys("*"));
+    }
+
+    private String formatKey(String key) {
+        return String.format("%s:%s", clazz.getSimpleName(), key);
     }
 }

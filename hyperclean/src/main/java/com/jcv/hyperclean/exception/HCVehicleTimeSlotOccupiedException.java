@@ -1,8 +1,14 @@
 package com.jcv.hyperclean.exception;
 
-public class HCVehicleTimeSlotOccupiedException extends Exception{
+import com.jcv.hyperclean.dto.AppointmentDTO;
+import lombok.Getter;
 
-    public HCVehicleTimeSlotOccupiedException() {
-        super("The vehicle will be occupied on the specified time slot, please select a different time");
+@Getter
+public class HCVehicleTimeSlotOccupiedException extends Exception {
+    private final AppointmentDTO conflictingAppointment;
+
+    public HCVehicleTimeSlotOccupiedException(AppointmentDTO conflictingAppointment, String message) {
+        super(message);
+        this.conflictingAppointment = conflictingAppointment;
     }
 }

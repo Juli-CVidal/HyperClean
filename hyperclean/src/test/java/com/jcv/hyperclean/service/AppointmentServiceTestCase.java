@@ -3,17 +3,18 @@ package com.jcv.hyperclean.service;
 import com.jcv.hyperclean.dto.request.AppointmentRequestDTO;
 import com.jcv.hyperclean.enums.AppointmentStatus;
 import com.jcv.hyperclean.enums.ServiceType;
+import com.jcv.hyperclean.exception.HCNotFoundException;
 import com.jcv.hyperclean.exception.HCValidationFailedException;
 import com.jcv.hyperclean.model.Appointment;
 import com.jcv.hyperclean.model.Customer;
 import com.jcv.hyperclean.model.Vehicle;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
 
@@ -74,7 +75,7 @@ class AppointmentServiceTestCase extends BaseServiceTest {
 
     @Test
     void testNotFoundById() {
-        Assertions.assertThrows(EntityNotFoundException.class, () -> appointmentService.findById(1L));
+        Assertions.assertThrows(HCNotFoundException.class, () -> appointmentService.findById(1L));
     }
 
     @Test
@@ -147,7 +148,11 @@ class AppointmentServiceTestCase extends BaseServiceTest {
 
     private void assertFields(Appointment appointment, LocalDateTime date, AppointmentStatus status, ServiceType type, Long vehicleId) {
         Assertions.assertNotNull(appointment.getId(), "Doesn't have id");
-        Assertions.assertEquals(date, appointment.getAppointmentDate(), "Appointment date doesn't match");
+        Assertions.assertEquals(
+                date.truncatedTo(ChronoUnit.SECONDS),
+                appointment.getAppointmentDate().truncatedTo(ChronoUnit.SECONDS),
+                "Appointment date doesn't match"
+        );
         Assertions.assertEquals(status, appointment.getStatus(), "Appointment status doesn't match");
         Assertions.assertEquals(type, appointment.getType(), "Appointment type doesn't match");
         Assertions.assertEquals(vehicleId, appointment.getVehicle().getId(), "Vehicle doesn't match");

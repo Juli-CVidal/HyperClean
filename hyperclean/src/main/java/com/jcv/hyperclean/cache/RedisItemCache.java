@@ -19,7 +19,7 @@ public class RedisItemCache<T> {
     }
 
     public T get(String key) {
-        T value = redisTemplate.opsForValue().get(key);
+        T value = redisTemplate.opsForValue().get(formatKey(key));
         if (Objects.isNull(value)) {
             return null;
         }
@@ -27,14 +27,18 @@ public class RedisItemCache<T> {
     }
 
     public void put(String key, T value) {
-        redisTemplate.opsForValue().set(key, value, duration.getSeconds(), TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(formatKey(key), value, duration.getSeconds(), TimeUnit.SECONDS);
     }
 
     public void invalidate(String key) {
-        redisTemplate.delete(key);
+        redisTemplate.delete(formatKey(key));
     }
 
     public void flushAll() {
         redisTemplate.delete(redisTemplate.keys("*"));
+    }
+
+    private String formatKey(String key) {
+        return String.format("%s:%s", clazz.getSimpleName(), key);
     }
 }

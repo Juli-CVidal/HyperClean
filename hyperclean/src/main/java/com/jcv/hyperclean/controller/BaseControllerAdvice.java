@@ -1,86 +1,79 @@
 package com.jcv.hyperclean.controller;
 
+import com.jcv.hyperclean.dto.AppointmentDTO;
+import com.jcv.hyperclean.dto.ResponseDTO;
+import com.jcv.hyperclean.exception.HCInvalidDateTimeFormat;
+import com.jcv.hyperclean.exception.HCNotFoundException;
 import com.jcv.hyperclean.exception.HCValidationFailedException;
 import com.jcv.hyperclean.exception.HCVehicleTimeSlotOccupiedException;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import static com.jcv.hyperclean.util.ListUtils.listToMap;
+import static com.jcv.hyperclean.util.ListUtils.mapList;
 
 @RestControllerAdvice
 public class BaseControllerAdvice {
 
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = listToMap(ex.getBindingResult().getAllErrors(), error -> ((FieldError) error).getField(), ObjectError::getDefaultMessage);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-    }
+    public ResponseEntity<ResponseDTO<List<Map<String, String>>>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        List<Map<String, String>> errorList = mapList( ex.getBindingResult().getFieldErrors(), fieldError -> Map.of(
+                "field", fieldError.getField(),
+                "error", fieldError.getDefaultMessage()
+        ));
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<String> handleEntityNotFoundException(EntityNotFoundException ex) {
-        String message = ex.getMessage();
-        String entityName = extractEntityName(message);
-
-        String responseMessage = entityName != null
-                ? entityName + " not found."
-                : "Resource not found.";
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMessage);
-    }
-
-    private String extractEntityName(String message) {
-        if (message == null) {
-            return null;
-        }
-
-        String[] parts = message.split(" ");
-        if (parts.length > 3) {
-            String fullClassName = parts[3]; // com.example.Customer
-            return fullClassName.substring(fullClassName.lastIndexOf(".") + 1);
-        }
-        return null;
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({HCValidationFailedException.class})
-    public ResponseEntity<String> handleIllegalArgumentAndStateException(HCValidationFailedException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({HCVehicleTimeSlotOccupiedException.class})
-    public ResponseEntity<String> handleHCVehicleTimeSlotOccupiedException(HCVehicleTimeSlotOccupiedException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({HttpMessageNotReadableException.class})
-    public ResponseEntity<String> handleMessageNotReadableException() {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The request body is invalid. Please review it and try again.");
+        return ResponseEntity.badRequest().body(ResponseDTO.of(errorList, "Validation failed. Please check the provided data."));
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<Map<String, String>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+    public ResponseEntity<ResponseDTO<Map<String, String>>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "Data Integrity Violation");
-        errorResponse.put("message", ex.getRootCause().getMessage());
+        errorResponse.put("message", ex.getRootCause() != null ? ex.getRootCause().getMessage() : "Unknown error");
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return ResponseEntity.badRequest().body(ResponseDTO.of(errorResponse, "There's already an instance with that data."));
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HCValidationFailedException.class)
+    public ResponseEntity<ResponseDTO<Object>> handleHCValidationFailedException(HCValidationFailedException ex) {
+        return ResponseEntity.badRequest().body(ResponseDTO.of(ex.getEntity(), ex.getMessage()));
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HCVehicleTimeSlotOccupiedException.class)
+    public ResponseEntity<ResponseDTO<AppointmentDTO>> handleHCVehicleTimeSlotOccupiedException(HCVehicleTimeSlotOccupiedException ex) {
+        return ResponseEntity.badRequest().body(ResponseDTO.of(ex.getConflictingAppointment(), ex.getMessage()));
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ResponseDTO<String>> handleMessageNotReadableException() {
+        return ResponseEntity.badRequest().body(ResponseDTO.of(null, "The request body is invalid. Please review it and try again."));
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HCInvalidDateTimeFormat.class)
+    public ResponseEntity<ResponseDTO<String>> handleHCInvalidDateTimeFormat(HCInvalidDateTimeFormat ex) {
+        return ResponseEntity.badRequest().body(ResponseDTO.of(ex.getInvalidDate(), ex.getMessage()));
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(HCNotFoundException.class)
+    public ResponseEntity<ResponseDTO<Object>> handleHCNotFoundException(HCNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDTO.of(null, ex.getMessage()));
     }
 }
+
 

@@ -4,8 +4,10 @@ import com.jcv.hyperclean.cache.RedisItemCache;
 import com.jcv.hyperclean.cache.RedisListCache;
 import com.jcv.hyperclean.dto.CustomerDTO;
 import com.jcv.hyperclean.dto.request.CustomerRequestDTO;
+import com.jcv.hyperclean.exception.HCNotFoundException;
 import com.jcv.hyperclean.model.Customer;
 import com.jcv.hyperclean.repository.CustomerRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,17 +45,32 @@ public class CustomerService extends CacheableService<Customer> {
 
     @Transactional(readOnly = true)
     public Customer findById(Long id) {
+        try {
         return findBy(id, customerRepository::findById);
+        } catch (EntityNotFoundException e) {
+            String errorMsg = String.format("Could not find a customer with id: %s ", id);
+            throw new HCNotFoundException(errorMsg);
+        }
     }
 
     @Transactional(readOnly = true)
     public Customer findByEmail(String email) {
+        try {
         return findBy(email, customerRepository::findByEmail);
+        } catch (EntityNotFoundException e) {
+            String errorMsg = String.format("Could not find a customer with email: %s ", email);
+            throw new HCNotFoundException(errorMsg);
+        }
     }
 
     @Transactional(readOnly = true)
     public Customer findByPhone(String phone) {
+        try {
         return findBy(phone, customerRepository::findByPhone);
+        } catch (EntityNotFoundException e) {
+            String errorMsg = String.format("Could not find a customer with phone: %s ", phone);
+            throw new HCNotFoundException(errorMsg);
+        }
     }
 
     @Transactional(readOnly = true)

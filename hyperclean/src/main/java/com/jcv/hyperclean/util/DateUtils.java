@@ -7,14 +7,14 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class DateUtils {
-
-    private static final DateTimeFormatter dd_MM_yyyy_HH_mm_ss = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+    public static final String TIME_FORMAT = "dd-MM-yyyy HH:mm:ss";
+    private static final DateTimeFormatter dd_MM_yyyy_HH_mm_ss = DateTimeFormatter.ofPattern(TIME_FORMAT);
 
     public static LocalDateTime stringToLocalDateTime(String dateStr) throws HCInvalidDateTimeFormat {
         try {
             return LocalDateTime.parse(dateStr, dd_MM_yyyy_HH_mm_ss);
         } catch (DateTimeParseException e) {
-            throw new HCInvalidDateTimeFormat("Invalid date format. Expected format: dd-MM-yyyy HH:mm:ss", e);
+            throw new HCInvalidDateTimeFormat(dateStr);
         }
     }
 

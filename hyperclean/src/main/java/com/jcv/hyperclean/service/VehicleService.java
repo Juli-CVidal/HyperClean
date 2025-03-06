@@ -3,9 +3,11 @@ package com.jcv.hyperclean.service;
 import com.jcv.hyperclean.cache.RedisItemCache;
 import com.jcv.hyperclean.cache.RedisListCache;
 import com.jcv.hyperclean.dto.request.VehicleRequestDTO;
+import com.jcv.hyperclean.exception.HCNotFoundException;
 import com.jcv.hyperclean.model.Customer;
 import com.jcv.hyperclean.model.Vehicle;
 import com.jcv.hyperclean.repository.VehicleRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +48,12 @@ public class VehicleService extends CacheableService<Vehicle> {
 
     @Transactional(readOnly = true)
     public Vehicle findById(Long id) {
-        return findBy(id, vehicleRepository::findById);
+        try {
+            return findBy(id, vehicleRepository::findById);
+        } catch (EntityNotFoundException e) {
+            String errorMsg = String.format("Could not find a vehicle with id: %s ", id);
+            throw new HCNotFoundException(errorMsg);
+        }
     }
 
     @Transactional(readOnly = true)

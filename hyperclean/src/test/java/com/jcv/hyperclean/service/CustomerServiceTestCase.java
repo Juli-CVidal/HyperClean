@@ -2,8 +2,8 @@ package com.jcv.hyperclean.service;
 
 import com.jcv.hyperclean.dto.CustomerDTO;
 import com.jcv.hyperclean.dto.request.CustomerRequestDTO;
+import com.jcv.hyperclean.exception.HCNotFoundException;
 import com.jcv.hyperclean.model.Customer;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -74,7 +74,7 @@ class CustomerServiceTestCase extends BaseServiceTest {
 
     @Test
     void testNotFound() {
-        Assertions.assertThrows(EntityNotFoundException.class, () -> customerService.findById(1L));
+        Assertions.assertThrows(HCNotFoundException.class, () -> customerService.findById(1L));
     }
 
     private void assertHasFields(Customer customer) {

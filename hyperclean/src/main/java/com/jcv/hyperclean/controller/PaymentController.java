@@ -1,6 +1,7 @@
 package com.jcv.hyperclean.controller;
 
 import com.jcv.hyperclean.dto.PaymentDTO;
+import com.jcv.hyperclean.dto.ResponseDTO;
 import com.jcv.hyperclean.dto.request.PaymentRequestDTO;
 import com.jcv.hyperclean.exception.HCInvalidDateTimeFormat;
 import com.jcv.hyperclean.exception.HCValidationFailedException;
@@ -21,17 +22,21 @@ public class PaymentController {
     }
 
     @PostMapping
-    public ResponseEntity<PaymentDTO> create(@Valid @RequestBody PaymentRequestDTO requestDTO) throws HCValidationFailedException, HCInvalidDateTimeFormat {
-        return ResponseEntity.ok(PaymentDTO.from(paymentService.create(requestDTO)));
+    public ResponseEntity<ResponseDTO<PaymentDTO>> create(@Valid @RequestBody PaymentRequestDTO requestDTO)
+            throws HCValidationFailedException, HCInvalidDateTimeFormat {
+        PaymentDTO dto = PaymentDTO.from(paymentService.create(requestDTO));
+        return ResponseEntity.ok(ResponseDTO.of(dto, "The payment was processed successfully."));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PaymentDTO> get(@PathVariable Long id) {
-        return ResponseEntity.ok(paymentService.findById(id));
+    public ResponseEntity<ResponseDTO<PaymentDTO>> get(@PathVariable Long id) {
+        PaymentDTO dto = PaymentDTO.from(paymentService.findById(id));
+        return ResponseEntity.ok(ResponseDTO.of(dto, "The payment details were retrieved successfully."));
     }
 
     @GetMapping("/by-appointment/{appointmentId}")
-    public ResponseEntity<PaymentDTO> getByAppointment(@PathVariable Long appointmentId) {
-        return ResponseEntity.ok(paymentService.findByAppointmentId(appointmentId));
+    public ResponseEntity<ResponseDTO<PaymentDTO>> getByAppointment(@PathVariable Long appointmentId) {
+        PaymentDTO dto = PaymentDTO.from(paymentService.findByAppointmentId(appointmentId));
+        return ResponseEntity.ok(ResponseDTO.of(dto, "The payment linked to the appointment was retrieved successfully."));
     }
 }

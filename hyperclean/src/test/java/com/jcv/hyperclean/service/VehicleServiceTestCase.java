@@ -2,9 +2,9 @@ package com.jcv.hyperclean.service;
 
 import com.jcv.hyperclean.dto.request.VehicleRequestDTO;
 import com.jcv.hyperclean.enums.VehicleType;
+import com.jcv.hyperclean.exception.HCNotFoundException;
 import com.jcv.hyperclean.model.Customer;
 import com.jcv.hyperclean.model.Vehicle;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,7 +64,7 @@ class VehicleServiceTestCase extends BaseServiceTest {
 
     @Test
     void assertNotFoundById() {
-        Assertions.assertThrows(EntityNotFoundException.class, () -> vehicleService.findById(1L));
+        Assertions.assertThrows(HCNotFoundException.class, () -> vehicleService.findById(1L));
     }
 
     @Test

@@ -57,7 +57,7 @@ public abstract class CacheableService<T extends BasicModel> {
         List<T> cachedList;
         try {
             cachedList = listCache.get(key);
-        } catch(RedisSystemException e) {
+        } catch (RedisSystemException e) {
             cachedList = Collections.emptyList();
         }
 
