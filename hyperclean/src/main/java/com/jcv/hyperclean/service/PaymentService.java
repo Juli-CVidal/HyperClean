@@ -44,7 +44,7 @@ public class PaymentService extends CacheableService<Payment> {
 
         appointmentService.markAsPaid(appointment);
 
-        putInCache(String.valueOf(payment.getId()), payment);
+        putInCache(payment.getId(), payment);
         return save(payment);
     }
 

@@ -29,7 +29,7 @@ public class AppointmentService extends CacheableService<Appointment> {
 
     @Transactional
     public Appointment save(Appointment appointment) {
-        invalidateCache(String.valueOf(appointment.getId()));
+        invalidateCache(appointment.getId());
         return appointmentRepository.save(appointment);
     }
 
@@ -40,7 +40,7 @@ public class AppointmentService extends CacheableService<Appointment> {
         appointment.setVehicle(vehicle);
 
         appointment = save(appointment);
-        putInCache(String.valueOf(appointment.getId()), appointment);
+        putInCache(appointment.getId(), appointment);
         return appointment;
     }
 
@@ -84,8 +84,8 @@ public class AppointmentService extends CacheableService<Appointment> {
     private AppointmentDTO updateStatusAndSave(Appointment appointment, AppointmentStatus status) {
         appointment.setStatus(status);
         appointmentRepository.save(appointment);
-        invalidateListCache(String.valueOf(appointment.getVehicle().getId()));
-        invalidateCache(String.valueOf(appointment.getId()));
+        invalidateListCache(appointment.getVehicle().getId());
+        invalidateCache(appointment.getId());
         return AppointmentDTO.from(appointment);
     }
 

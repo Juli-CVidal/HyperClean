@@ -27,12 +27,24 @@ public abstract class CacheableService<T extends BasicModel> {
         cache.put(key, value);
     }
 
+    protected void putInCache(Long key, T value) {
+        putInCache(String.valueOf(key), value);
+    }
+
     protected void setListCache(String key, List<T> values) {
         listCache.set(key, values);
     }
 
+    protected void setListCache(Long key, List<T> values) {
+        setListCache(String.valueOf(key), values);
+    }
+
     protected Optional<T> getCached(String key) {
         return Optional.ofNullable(cache.get(key));
+    }
+
+    protected Optional<T> getCached(Long key) {
+        return getCached(String.valueOf(key));
     }
 
     protected Optional<List<T>> getCachedList(String key) {
@@ -43,12 +55,24 @@ public abstract class CacheableService<T extends BasicModel> {
         return Optional.ofNullable(cachedList);
     }
 
+    protected Optional<List<T>> getCachedListList(Long key) {
+        return getCachedList(String.valueOf(key));
+    }
+
     protected void invalidateCache(String key) {
         cache.invalidate(key);
     }
 
+    protected void invalidateCache(Long key) {
+        invalidateCache(String.valueOf(key));
+    }
+
     protected void invalidateListCache(String key) {
         listCache.invalidate(key);
+    }
+
+    protected void invalidateListCache(Long key) {
+        invalidateListCache(String.valueOf(key));
     }
 
     protected void flushItemCache() {

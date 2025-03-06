@@ -36,7 +36,7 @@ public class CustomerService extends CacheableService<Customer> {
     public Customer create(@Valid CustomerRequestDTO requestDTO) {
         Customer customer = save(Customer.of(requestDTO));
 
-        putInCache(String.valueOf(customer.getId()), customer);
+        putInCache(customer.getId(), customer);
         invalidateListCache(ALL_CUSTOMERS_CACHE_KEY);
         return customer;
     }

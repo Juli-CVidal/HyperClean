@@ -27,7 +27,9 @@ public class VehicleService extends CacheableService<Vehicle> {
 
     @Transactional
     public Vehicle save(Vehicle vehicle) {
-        invalidateListCache(String.valueOf(vehicle.getCustomer().getId()));
+        putInCache(vehicle.getId(), vehicle);
+        Long customerId = vehicle.getCustomer().getId();
+        invalidateListCache(customerId);
         return vehicleRepository.save(vehicle);
     }
 
@@ -39,8 +41,8 @@ public class VehicleService extends CacheableService<Vehicle> {
         vehicle.setCustomer(customer);
 
         vehicle = save(vehicle);
-        putInCache(String.valueOf(vehicle.getId()), vehicle);
-        invalidateListCache(String.valueOf(customer.getId()));
+        putInCache(vehicle.getId(), vehicle);
+        invalidateListCache(customer.getId());
         return vehicle;
     }
 
@@ -67,9 +69,9 @@ public class VehicleService extends CacheableService<Vehicle> {
         Customer customer = customerService.findById(customerId);
         vehicle.setCustomer(customer);
 
-        invalidateCache(String.valueOf(vehicle.getId()));
-        invalidateListCache(String.valueOf(customerId));
-        invalidateListCache(String.valueOf(oldCustomerId));
+        invalidateCache(vehicle.getId());
+        invalidateListCache(customerId);
+        invalidateListCache(oldCustomerId);
         return save(vehicle);
     }
 }
