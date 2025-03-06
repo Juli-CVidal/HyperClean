@@ -14,11 +14,16 @@ import java.time.Duration;
 @Configuration
 public class RedisCacheFactory {
     private static final Duration DEFAULT_EXPIRATION = Duration.ofMinutes(5);
+
     @Autowired private RedisTemplate<String, Appointment> appointmentTemplate;
     @Autowired private RedisTemplate<String, Customer> customerTemplate;
     @Autowired private RedisTemplate<String, Payment> paymentTemplate;
     @Autowired private RedisTemplate<String, Vehicle> vehicleTemplate;
 
+    @Autowired private RedisTemplate<String, Appointment> appointmentListTemplate;
+    @Autowired private RedisTemplate<String, Customer> customerListTemplate;
+    @Autowired private RedisTemplate<String, Payment> paymentListTemplate;
+    @Autowired private RedisTemplate<String, Vehicle> vehicleListTemplate;
 
     private <T> RedisItemCache<T> createItemCache(RedisTemplate<String, T> redisTemplate, Duration duration, Class<T> clazz) {
         return new RedisItemCache<>(redisTemplate, duration, clazz);
@@ -43,7 +48,7 @@ public class RedisCacheFactory {
 
     @Bean
     public RedisListCache<Appointment> appointmentListCache() {
-        return createListCache(appointmentTemplate, Appointment.class);
+        return createListCache(appointmentListTemplate, Appointment.class);
     }
 
     @Bean
@@ -53,7 +58,7 @@ public class RedisCacheFactory {
 
     @Bean
     public RedisListCache<Customer> customerListCache() {
-        return createListCache(customerTemplate, Customer.class);
+        return createListCache(customerListTemplate, Customer.class);
     }
 
     @Bean
@@ -63,7 +68,7 @@ public class RedisCacheFactory {
 
     @Bean
     public RedisListCache<Vehicle> vehicleListCache() {
-        return createListCache(vehicleTemplate, Vehicle.class);
+        return createListCache(vehicleListTemplate, Vehicle.class);
     }
 
     @Bean
@@ -73,6 +78,6 @@ public class RedisCacheFactory {
 
     @Bean
     public RedisListCache<Payment> paymentListCache() {
-        return createListCache(paymentTemplate, Payment.class);
+        return createListCache(paymentListTemplate, Payment.class);
     }
 }
