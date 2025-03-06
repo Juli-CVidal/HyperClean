@@ -5,14 +5,13 @@ import com.jcv.hyperclean.cache.RedisListCache;
 import com.jcv.hyperclean.model.BasicModel;
 import com.jcv.hyperclean.util.ListUtils;
 import jakarta.persistence.EntityNotFoundException;
-import org.hibernate.proxy.HibernateProxy;
+import org.springframework.data.redis.RedisSystemException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import static com.jcv.hyperclean.util.ListUtils.mapList;
 
 public abstract class CacheableService<T extends BasicModel> {
     private final RedisItemCache<T> cache;
@@ -40,7 +39,14 @@ public abstract class CacheableService<T extends BasicModel> {
     }
 
     protected Optional<T> getCached(String key) {
-        return Optional.ofNullable(cache.get(key));
+        T cachedElement;
+
+        try {
+            cachedElement = cache.get(key);
+        } catch (RedisSystemException e) {
+            cachedElement = null;
+        }
+        return Optional.ofNullable(cachedElement);
     }
 
     protected Optional<T> getCached(Long key) {
@@ -48,7 +54,13 @@ public abstract class CacheableService<T extends BasicModel> {
     }
 
     protected Optional<List<T>> getCachedList(String key) {
-        List<T> cachedList = listCache.get(key);
+        List<T> cachedList;
+        try {
+            cachedList = listCache.get(key);
+        } catch(RedisSystemException e) {
+            cachedList = Collections.emptyList();
+        }
+
         if (ListUtils.isEmpty(cachedList)) {
             return Optional.empty();
         }
@@ -110,6 +122,18 @@ public abstract class CacheableService<T extends BasicModel> {
         });
     }
 
+    protected T safeFindBy(Long key, Function<Long, Optional<T>> repositoryMethod) {
+        return getCached(key).orElseGet(() -> {
+            T item = repositoryMethod.apply(key)
+                    .filter(t -> t.getId() != null) // Ensure entity exists
+                    .orElse(null);
+            if (item != null) {
+                putInCache(key, item);
+            }
+            return item;
+        });
+    }
+
     /**
      * Same functionality as {@code safeFindBy} but it will throw an exception if the element was not found
      */
@@ -122,7 +146,11 @@ public abstract class CacheableService<T extends BasicModel> {
     }
 
     protected T findBy(Long key, Function<Long, Optional<T>> repositoryMethod) throws EntityNotFoundException {
-        return findBy(String.valueOf(key), id -> repositoryMethod.apply(Long.valueOf(id)));
+        T element = safeFindBy(key, repositoryMethod);
+        if (element != null) {
+            return element;
+        }
+        throw new EntityNotFoundException(String.valueOf(key));
     }
 
     /**
@@ -133,25 +161,18 @@ public abstract class CacheableService<T extends BasicModel> {
      * @param repositoryMethod A function to retrieve the list of elements from the database.
      * @return A list of found elements (could be empty).
      */
-    protected List<T> safeFindListBy(String key, Function<String, List<T>> repositoryMethod) {
+    protected List<T> safeFindListBy(String key, Function<Long, List<T>> repositoryMethod) {
         return getCachedList(key).orElseGet(() -> {
-            List<T> items = repositoryMethod.apply(key);
+            List<T> items = repositoryMethod.apply(Long.valueOf(key));
             if (!items.isEmpty()) {
-                setListCache(key, mapList(items, this::convertToPlainObject));
+                setListCache(key, items);
             }
             return items;
         });
     }
 
-    public <T> T convertToPlainObject(T entity) {
-        if (entity instanceof HibernateProxy) {
-            return (T) ((HibernateProxy) entity).getHibernateLazyInitializer().getImplementation();
-        }
-        return entity;
-    }
-
     protected List<T> safeFindListBy(Long key, Function<Long, List<T>> repositoryMethod) {
-        return safeFindListBy(String.valueOf(key), id -> repositoryMethod.apply(Long.valueOf(id)));
+        return safeFindListBy(String.valueOf(key), repositoryMethod);
     }
 
     /**
@@ -163,7 +184,7 @@ public abstract class CacheableService<T extends BasicModel> {
      * @return A list of found elements.
      * @throws EntityNotFoundException if no elements are found.
      */
-    protected List<T> findListBy(String key, Function<String, List<T>> repositoryMethod) throws EntityNotFoundException {
+    protected List<T> findListBy(String key, Function<Long, List<T>> repositoryMethod) throws EntityNotFoundException {
         List<T> elements = safeFindListBy(key, repositoryMethod);
         if (!elements.isEmpty()) {
             return elements;
@@ -172,7 +193,7 @@ public abstract class CacheableService<T extends BasicModel> {
     }
 
     protected List<T> findListBy(Long key, Function<Long, List<T>> repositoryMethod) throws EntityNotFoundException {
-        return findListBy(String.valueOf(key), id -> repositoryMethod.apply(Long.valueOf(id)));
+        return findListBy(String.valueOf(key), repositoryMethod);
     }
 
     /**
