@@ -1,5 +1,6 @@
 package com.jcv.hyperclean.controller;
 
+import com.jcv.hyperclean.exception.HCValidationFailedException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -53,7 +54,7 @@ public class BaseControllerAdvice {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
+    @ExceptionHandler({HCValidationFailedException.class})
     public ResponseEntity<String> handleIllegalArgumentAndStateException(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }

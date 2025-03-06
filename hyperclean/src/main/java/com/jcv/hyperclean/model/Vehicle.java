@@ -1,5 +1,6 @@
 package com.jcv.hyperclean.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jcv.hyperclean.dto.request.VehicleRequestDTO;
 import com.jcv.hyperclean.enums.VehicleType;
 import jakarta.persistence.*;
@@ -16,10 +17,13 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "vehicle")
 public class Vehicle extends BasicModel {
     private String model;
+
+    @Column(unique = true)
     private String licensePlate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
+    @JsonIgnore
     private Customer customer;
 
     @Enumerated(EnumType.STRING)

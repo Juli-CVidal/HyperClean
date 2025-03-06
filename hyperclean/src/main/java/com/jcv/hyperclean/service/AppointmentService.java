@@ -5,6 +5,7 @@ import com.jcv.hyperclean.cache.RedisListCache;
 import com.jcv.hyperclean.dto.AppointmentDTO;
 import com.jcv.hyperclean.dto.request.AppointmentRequestDTO;
 import com.jcv.hyperclean.enums.AppointmentStatus;
+import com.jcv.hyperclean.exception.HCValidationFailedException;
 import com.jcv.hyperclean.model.Appointment;
 import com.jcv.hyperclean.model.Vehicle;
 import com.jcv.hyperclean.repository.AppointmentRepository;
@@ -54,27 +55,27 @@ public class AppointmentService extends CacheableService<Appointment> {
     }
 
     @Transactional
-    public AppointmentDTO markAsInProgress(Long id) {
+    public AppointmentDTO markAsInProgress(Long id) throws HCValidationFailedException {
         Appointment appointment = findById(id);
         if (!appointment.isPending()) {
-            throw new IllegalStateException("Appointment is not in pending state");
+            throw new HCValidationFailedException("Appointment is not in pending state");
         }
 
         return updateStatusAndSave(appointment, AppointmentStatus.IN_PROGRESS);
     }
 
     @Transactional
-    public AppointmentDTO markAsFinished(Long id) {
+    public AppointmentDTO markAsFinished(Long id) throws HCValidationFailedException {
         Appointment appointment = findById(id);
         if (!appointment.hasFinished()) {
-            throw new IllegalStateException("Appointment has not finished");
+            throw new HCValidationFailedException("Appointment has not finished");
         }
 
         return updateStatusAndSave(appointment, AppointmentStatus.FINISHED);
     }
 
     @Transactional
-    public void markAsPaid(Appointment appointment) {
+    public void markAsPaid(Appointment appointment) throws HCValidationFailedException {
         validateApplicableForPayment(appointment);
 
         updateStatusAndSave(appointment, AppointmentStatus.PAID);
@@ -88,13 +89,13 @@ public class AppointmentService extends CacheableService<Appointment> {
         return AppointmentDTO.from(appointment);
     }
 
-    private void validateApplicableForPayment(Appointment appointment) {
+    private void validateApplicableForPayment(Appointment appointment) throws HCValidationFailedException {
         if (appointment.wasPaid()) {
-            throw new IllegalStateException("Appointment already paid");
+            throw new HCValidationFailedException("Appointment already paid");
         }
 
         if (!appointment.isApplicableForPayment()) {
-            throw new IllegalStateException("Appointment is not applicable for payment");
+            throw new HCValidationFailedException("Appointment is not applicable for payment");
         }
     }
 }

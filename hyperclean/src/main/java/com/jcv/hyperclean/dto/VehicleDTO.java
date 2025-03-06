@@ -20,6 +20,7 @@ public class VehicleDTO extends BasicDTO {
     public static VehicleDTO from(Vehicle vehicle) {
         return VehicleDTO.builder()
                 .id(vehicle.getId())
+                .model(vehicle.getModel())
                 .licensePlate(vehicle.getLicensePlate())
                 .customerId(vehicle.getCustomer().getId())
                 .type(vehicle.getType())

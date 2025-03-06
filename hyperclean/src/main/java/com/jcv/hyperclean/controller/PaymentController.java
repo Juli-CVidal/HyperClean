@@ -2,6 +2,7 @@ package com.jcv.hyperclean.controller;
 
 import com.jcv.hyperclean.dto.PaymentDTO;
 import com.jcv.hyperclean.dto.request.PaymentRequestDTO;
+import com.jcv.hyperclean.exception.HCValidationFailedException;
 import com.jcv.hyperclean.service.PaymentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class PaymentController {
     }
 
     @PostMapping
-    public ResponseEntity<PaymentDTO> create(@Valid @RequestBody PaymentRequestDTO requestDTO) {
+    public ResponseEntity<PaymentDTO> create(@Valid @RequestBody PaymentRequestDTO requestDTO) throws HCValidationFailedException {
         return ResponseEntity.ok(PaymentDTO.from(paymentService.create(requestDTO)));
     }
 

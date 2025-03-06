@@ -5,6 +5,7 @@ import com.jcv.hyperclean.cache.RedisListCache;
 import com.jcv.hyperclean.dto.PaymentDTO;
 import com.jcv.hyperclean.dto.request.PaymentRequestDTO;
 import com.jcv.hyperclean.enums.PaymentType;
+import com.jcv.hyperclean.exception.HCValidationFailedException;
 import com.jcv.hyperclean.model.Appointment;
 import com.jcv.hyperclean.model.Payment;
 import com.jcv.hyperclean.repository.PaymentRepository;
@@ -30,9 +31,9 @@ public class PaymentService extends CacheableService<Payment> {
     }
 
     @Transactional
-    public Payment create(PaymentRequestDTO requestDTO) {
+    public Payment create(PaymentRequestDTO requestDTO) throws HCValidationFailedException {
         if (!requestDTO.getType().equals(PaymentType.CASH)) {
-            throw new IllegalArgumentException("Currently we only support payment by cash");
+            throw new HCValidationFailedException("Currently we only support payment by cash");
         }
 
         Appointment appointment = appointmentService.findById(requestDTO.getAppointmentId());
@@ -59,12 +60,13 @@ public class PaymentService extends CacheableService<Payment> {
        return PaymentDTO.from(payment);
     }
 
-    private void validatePayment(Payment payment) {
+
+    private void validatePayment(Payment payment) throws HCValidationFailedException {
         Appointment appointment = payment.getAppointment();
         Double costOfCleaning = appointment.getCostOfCleaning();
 
         if (costOfCleaning > payment.getAmount()) {
-            throw new IllegalStateException("Payment amount is less than the cost of cleaning");
+            throw new HCValidationFailedException("Payment amount is less than the cost of cleaning");
         }
     }
 }

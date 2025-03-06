@@ -3,6 +3,7 @@ package com.jcv.hyperclean.service;
 import com.jcv.hyperclean.dto.request.PaymentRequestDTO;
 import com.jcv.hyperclean.enums.AppointmentStatus;
 import com.jcv.hyperclean.enums.PaymentType;
+import com.jcv.hyperclean.exception.HCValidationFailedException;
 import com.jcv.hyperclean.model.Appointment;
 import com.jcv.hyperclean.model.Payment;
 import jakarta.persistence.EntityNotFoundException;
@@ -33,11 +34,11 @@ public class PaymentServiceTestCase extends BaseServiceTest {
         requestDTO.setType(PaymentType.CASH);
 
         // The amount to pay is lesser than the cost of the appointment (appointment.getCostOfCleaning())
-        Assertions.assertThrows(IllegalStateException.class, () -> paymentService.create(requestDTO));
+        Assertions.assertThrows(HCValidationFailedException.class, () -> paymentService.create(requestDTO));
         requestDTO.setAmount(appointment.getCostOfCleaning());
 
         // The appointment is not marked as finished
-        Assertions.assertThrows(IllegalStateException.class, () -> paymentService.create(requestDTO));
+        Assertions.assertThrows(HCValidationFailedException .class, () -> paymentService.create(requestDTO));
         markAppointmentAsFinished(appointment);
 
         Payment payment = Assertions.assertDoesNotThrow(() -> paymentService.create(requestDTO));

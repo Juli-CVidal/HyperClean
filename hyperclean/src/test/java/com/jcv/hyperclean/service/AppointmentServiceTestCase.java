@@ -3,6 +3,7 @@ package com.jcv.hyperclean.service;
 import com.jcv.hyperclean.dto.request.AppointmentRequestDTO;
 import com.jcv.hyperclean.enums.AppointmentStatus;
 import com.jcv.hyperclean.enums.ServiceType;
+import com.jcv.hyperclean.exception.HCValidationFailedException;
 import com.jcv.hyperclean.model.Appointment;
 import com.jcv.hyperclean.model.Customer;
 import com.jcv.hyperclean.model.Vehicle;
@@ -95,7 +96,7 @@ class AppointmentServiceTestCase extends BaseServiceTest {
     }
 
     @Test
-    void testMarkAsInProgress() {
+    void testMarkAsInProgress() throws HCValidationFailedException {
         Appointment appointment = createAppointment();
         Assertions.assertTrue(appointment.isPending());
         appointmentService.markAsInProgress(appointment.getId());
@@ -104,19 +105,19 @@ class AppointmentServiceTestCase extends BaseServiceTest {
         Assertions.assertTrue(updatedAppointment.isInProgress());
 
         // Shouldn't allow updating the state if it's different from PENDING
-        Assertions.assertThrows(IllegalStateException.class, () -> appointmentService.markAsInProgress(updatedAppointment.getId()));
+        Assertions.assertThrows(HCValidationFailedException.class, () -> appointmentService.markAsInProgress(updatedAppointment.getId()));
     }
 
     @Test
-    void testMarkAsFinished() {
+    void testMarkAsFinished() throws HCValidationFailedException {
         Appointment appointment = createAppointment();
 
         // It shouldn't work if the appointment is not in progress
-        Assertions.assertThrows(IllegalStateException.class, () -> appointmentService.markAsFinished(appointment.getId()));
+        Assertions.assertThrows(HCValidationFailedException.class, () -> appointmentService.markAsFinished(appointment.getId()));
         appointmentService.markAsInProgress(appointment.getId());
 
         // The appointment hasn't finished due to its time to completion (method appointment.hasFinished())
-        Assertions.assertThrows(IllegalStateException.class, () -> appointmentService.markAsFinished(appointment.getId()));
+        Assertions.assertThrows(HCValidationFailedException.class, () -> appointmentService.markAsFinished(appointment.getId()));
 
         // Forcing it to update by changing its date
         appointment.setAppointmentDate(appointment.getAppointmentDate().minusDays(1));
@@ -128,10 +129,10 @@ class AppointmentServiceTestCase extends BaseServiceTest {
     }
 
     @Test
-    void testMarkAsPaid() {
+    void testMarkAsPaid() throws HCValidationFailedException {
         Appointment appointment = createAppointment(LocalDateTime.now().minusDays(1));
         // It should work only if the appointment has finished
-        Assertions.assertThrows(IllegalStateException.class, () -> appointmentService.markAsPaid(appointment));
+        Assertions.assertThrows(HCValidationFailedException.class, () -> appointmentService.markAsPaid(appointment));
 
         appointmentService.markAsInProgress(appointment.getId());
         appointmentService.markAsFinished(appointment.getId());
@@ -141,7 +142,7 @@ class AppointmentServiceTestCase extends BaseServiceTest {
         Assertions.assertTrue(updatedAppointment.wasPaid());
 
         // It should fail if you try to re-pay for the appointment
-        Assertions.assertThrows(IllegalStateException.class, () -> appointmentService.markAsPaid(appointment));
+        Assertions.assertThrows(HCValidationFailedException.class, () -> appointmentService.markAsPaid(appointment));
     }
 
     private void assertFields(Appointment appointment, LocalDateTime date, AppointmentStatus status, ServiceType type, Long vehicleId) {

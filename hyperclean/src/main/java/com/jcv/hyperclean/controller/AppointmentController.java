@@ -2,6 +2,7 @@ package com.jcv.hyperclean.controller;
 
 import com.jcv.hyperclean.dto.AppointmentDTO;
 import com.jcv.hyperclean.dto.request.AppointmentRequestDTO;
+import com.jcv.hyperclean.exception.HCValidationFailedException;
 import com.jcv.hyperclean.model.Appointment;
 import com.jcv.hyperclean.service.AppointmentService;
 import jakarta.validation.Valid;
@@ -40,12 +41,12 @@ public class AppointmentController {
     }
 
     @PatchMapping("/{id}/mark-as-in-progress")
-    public ResponseEntity<AppointmentDTO> markAsInProgress(@PathVariable Long id) {
+    public ResponseEntity<AppointmentDTO> markAsInProgress(@PathVariable Long id) throws HCValidationFailedException {
         return ResponseEntity.ok(appointmentService.markAsInProgress(id));
     }
 
     @PatchMapping("/{id}/mark-as-finished")
-    public ResponseEntity<AppointmentDTO> markAsFinished(@PathVariable Long id) {
+    public ResponseEntity<AppointmentDTO> markAsFinished(@PathVariable Long id) throws HCValidationFailedException {
         return ResponseEntity.ok(appointmentService.markAsFinished(id));
     }
 }

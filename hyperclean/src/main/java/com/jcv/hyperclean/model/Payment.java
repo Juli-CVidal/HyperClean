@@ -1,5 +1,6 @@
 package com.jcv.hyperclean.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jcv.hyperclean.dto.request.PaymentRequestDTO;
 import com.jcv.hyperclean.enums.PaymentType;
 import jakarta.persistence.*;
@@ -22,6 +23,7 @@ public class Payment extends BasicModel {
 
     @OneToOne
     @JoinColumn(name = "appointment_id")
+    @JsonIgnore
     private Appointment appointment;
 
     @Enumerated(EnumType.STRING)
