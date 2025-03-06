@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jcv.hyperclean.dto.request.AppointmentRequestDTO;
 import com.jcv.hyperclean.enums.AppointmentStatus;
 import com.jcv.hyperclean.enums.ServiceType;
+import com.jcv.hyperclean.exception.HCInvalidDateTimeFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,8 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+
+import static com.jcv.hyperclean.util.DateUtils.stringToLocalDateTime;
 
 @Getter
 @Setter
@@ -33,9 +36,9 @@ public class Appointment extends BasicModel {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Vehicle vehicle;
 
-    public static Appointment of(AppointmentRequestDTO requestDTO) {
+    public static Appointment of(AppointmentRequestDTO requestDTO) throws HCInvalidDateTimeFormat {
         return Appointment.builder()
-                .appointmentDate(requestDTO.getAppointmentDate())
+                .appointmentDate(stringToLocalDateTime(requestDTO.getAppointmentDate()))
                 .status(Optional.ofNullable(requestDTO.getStatus()).orElse(AppointmentStatus.PENDING))
                 .type(requestDTO.getType())
                 .build();

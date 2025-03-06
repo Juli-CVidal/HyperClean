@@ -5,6 +5,7 @@ import com.jcv.hyperclean.cache.RedisListCache;
 import com.jcv.hyperclean.dto.PaymentDTO;
 import com.jcv.hyperclean.dto.request.PaymentRequestDTO;
 import com.jcv.hyperclean.enums.PaymentType;
+import com.jcv.hyperclean.exception.HCInvalidDateTimeFormat;
 import com.jcv.hyperclean.exception.HCValidationFailedException;
 import com.jcv.hyperclean.model.Appointment;
 import com.jcv.hyperclean.model.Payment;
@@ -31,7 +32,7 @@ public class PaymentService extends CacheableService<Payment> {
     }
 
     @Transactional
-    public Payment create(PaymentRequestDTO requestDTO) throws HCValidationFailedException {
+    public Payment create(PaymentRequestDTO requestDTO) throws HCValidationFailedException, HCInvalidDateTimeFormat {
         if (!requestDTO.getType().equals(PaymentType.CASH)) {
             throw new HCValidationFailedException("Currently we only support payment by cash");
         }

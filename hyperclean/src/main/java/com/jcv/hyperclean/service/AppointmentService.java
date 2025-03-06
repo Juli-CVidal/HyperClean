@@ -5,6 +5,7 @@ import com.jcv.hyperclean.cache.RedisListCache;
 import com.jcv.hyperclean.dto.AppointmentDTO;
 import com.jcv.hyperclean.dto.request.AppointmentRequestDTO;
 import com.jcv.hyperclean.enums.AppointmentStatus;
+import com.jcv.hyperclean.exception.HCInvalidDateTimeFormat;
 import com.jcv.hyperclean.exception.HCValidationFailedException;
 import com.jcv.hyperclean.model.Appointment;
 import com.jcv.hyperclean.model.Vehicle;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -34,9 +36,13 @@ public class AppointmentService extends CacheableService<Appointment> {
     }
 
     @Transactional
-    public Appointment create(AppointmentRequestDTO requestDTO) {
+    public Appointment create(AppointmentRequestDTO requestDTO) throws HCValidationFailedException, HCInvalidDateTimeFormat {
         Vehicle vehicle = vehicleService.findById(requestDTO.getVehicleId());
         Appointment appointment = Appointment.of(requestDTO);
+        if (appointment.getAppointmentDate().isBefore(LocalDateTime.now())) {
+            throw new HCValidationFailedException("You can't make an appointment using previous dates");
+        }
+
         appointment.setVehicle(vehicle);
 
         appointment = save(appointment);

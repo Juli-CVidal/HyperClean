@@ -3,6 +3,7 @@ package com.jcv.hyperclean.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jcv.hyperclean.dto.request.PaymentRequestDTO;
 import com.jcv.hyperclean.enums.PaymentType;
+import com.jcv.hyperclean.exception.HCInvalidDateTimeFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,8 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+
+import static com.jcv.hyperclean.util.DateUtils.stringToLocalDateTime;
 
 @Getter
 @Setter
@@ -29,11 +32,11 @@ public class Payment extends BasicModel {
     @Enumerated(EnumType.STRING)
     private PaymentType type;
 
-    public static Payment of(PaymentRequestDTO requestDTO) {
+    public static Payment of(PaymentRequestDTO requestDTO) throws HCInvalidDateTimeFormat {
         return Payment.builder()
                 .amount(requestDTO.getAmount())
                 .type(requestDTO.getType())
-                .paymentDate(requestDTO.getPaymentDate())
+                .paymentDate(stringToLocalDateTime(requestDTO.getPaymentDate()))
                 .build();
     }
 }

@@ -2,6 +2,7 @@ package com.jcv.hyperclean.controller;
 
 import com.jcv.hyperclean.dto.AppointmentDTO;
 import com.jcv.hyperclean.dto.request.AppointmentRequestDTO;
+import com.jcv.hyperclean.exception.HCInvalidDateTimeFormat;
 import com.jcv.hyperclean.exception.HCValidationFailedException;
 import com.jcv.hyperclean.model.Appointment;
 import com.jcv.hyperclean.service.AppointmentService;
@@ -25,7 +26,7 @@ public class AppointmentController {
     }
 
     @PostMapping
-    public ResponseEntity<AppointmentDTO> create(@Valid @RequestBody AppointmentRequestDTO requestDTO) {
+    public ResponseEntity<AppointmentDTO> create(@Valid @RequestBody AppointmentRequestDTO requestDTO) throws HCInvalidDateTimeFormat, HCValidationFailedException {
         return ResponseEntity.ok(AppointmentDTO.from(appointmentService.create(requestDTO)));
     }
 
