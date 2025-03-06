@@ -90,7 +90,7 @@ Assigns the vehicle to a customer
 ### Body Structure
 ```
 {
-  "appointmentDate": "LocalDateTime",
+  "appointmentDate": "string", // Format dd-MM-yyyy HH:mm:ss
   "status": "AppointmentStatus",
   "serviceType": "ServiceType",
   "vehicleId": "number"
@@ -108,11 +108,11 @@ Searches for appointments of a vehicle
 
 ## PATCH (/{id}/mark-as-in-progress)
 Allows to mark an appointment as in progress
-![PATCH mark as in progress](/docs/images/appointment/mark-as-in-progress.png)
+![PUT mark as in progress](/docs/images/appointment/mark-as-in-progress.png)
 
 ## PATCH (/{id}/mark-as-in-finished)
 Allows to mark an appointment as finished
-![PATCH mark as in progress](/docs/images/appointment/mark-as-finished.png)
+![PUT mark as in progress](/docs/images/appointment/mark-as-finished.png)
 
 # Payment (api/v1/payment)
 ## POST(/)
@@ -122,7 +122,7 @@ Allows to mark an appointment as finished
 ```
 {
   "amount": "number",
-  "paymentDate": "LocalDateTime",
+  "paymentDate": "String", // Format dd-MM-yyyy HH:mm:ss
   "type": "PaymentType",
   "appointmentId": "number"
 }
