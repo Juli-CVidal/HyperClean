@@ -6,7 +6,7 @@ import com.jcv.hyperclean.model.Payment;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import static com.jcv.hyperclean.util.DateUtils.localDateTimeToString;
 
 @Getter
 @Setter
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PaymentDTO extends BasicDTO {
     private Double amount;
-    private LocalDateTime paymentDate;
+    private String paymentDate;
     private Long appointmentId;
     private PaymentType type;
 
@@ -24,7 +24,7 @@ public class PaymentDTO extends BasicDTO {
         return PaymentDTO.builder()
                 .id(payment.getId())
                 .amount(payment.getAmount())
-                .paymentDate(payment.getPaymentDate())
+                .paymentDate(localDateTimeToString(payment.getPaymentDate()))
                 .type(payment.getType())
                 .appointmentId(payment.getAppointment().getId())
                 .build();

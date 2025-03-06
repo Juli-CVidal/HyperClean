@@ -6,7 +6,7 @@ import com.jcv.hyperclean.model.Appointment;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import static com.jcv.hyperclean.util.DateUtils.localDateTimeToString;
 
 @Getter
 @Setter
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class AppointmentDTO extends BasicDTO {
-    private LocalDateTime appointmentDate;
+    private String appointmentDate;
     private AppointmentStatus status;
     private ServiceType type;
     private Long vehicleId;
@@ -22,7 +22,7 @@ public class AppointmentDTO extends BasicDTO {
     public static AppointmentDTO from(Appointment appointment) {
         return AppointmentDTO.builder()
                 .id(appointment.getId())
-                .appointmentDate(appointment.getAppointmentDate())
+                .appointmentDate(localDateTimeToString(appointment.getAppointmentDate()))
                 .status(appointment.getStatus())
                 .type(appointment.getType())
                 .vehicleId(appointment.getVehicle().getId())
