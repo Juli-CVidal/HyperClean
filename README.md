@@ -1,6 +1,10 @@
 # HyperClean
 A car wash exercise made as a code challenge for MuniDigital
 
+### If you want to run it,
+Execute `launch.sh`, it will create the containers, setup the database and start the backend
+
+
 ## The database
 It's a MySQL database and has the following structure:
 
@@ -23,6 +27,9 @@ It's a MySQL database and has the following structure:
 
 The API is divided into four categories, CUSTOMER, VEHICLE, APPOINTMENT, PAYMENT
 
+--------------
+# The endpoints
+> Want to try it by yourself? Import `HyperClean.postman_collection.json` to your environment
 # Customer (api/v1/customer)
 
 ## POST(/)

@@ -1,0 +1,604 @@
+{
+	"info": {
+		"_postman_id": "9b61d837-33d9-4b67-996f-b20f29402609",
+		"name": "HyperClean",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25642317",
+		"_collection_link": "https://bold-shadow-79467.postman.co/workspace/Posman-API-Fundamentals-Student~4e543d46-ec0a-4b4e-9c0d-340b131ec1e4/collection/25642317-9b61d837-33d9-4b67-996f-b20f29402609?action=share&source=collection_link&creator=25642317"
+	},
+	"item": [
+		{
+			"name": "Customer",
+			"item": [
+				{
+					"name": "Create Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.status === 200) {\r",
+									"    const jsonData = pm.response.json().data;\r",
+									"    pm.collectionVariables.set(\"customerId\", jsonData.id);\r",
+									"    pm.collectionVariables.set(\"customerPhone\", jsonData.phone);\r",
+									"    pm.collectionVariables.set(\"customerEmail\", jsonData.email);\r",
+									"} else {\r",
+									"    console.log(\"Respuesta no exitosa. Status: \" + pm.response.status);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"hola\",\r\n  \"email\": \"johndoee@gmail.com\",\r\n  \"phone\": \"261222223\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customer",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customer"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[C] By id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"if (pm.response.status === 200) {\r",
+									"  const jsonData = pm.response.json();\r",
+									"  pm.collectionVariables.set(\"customerId\", jsonData.id);\r",
+									"  pm.collectionVariables.set(\"customerPhone\", jsonData.phone);\r",
+									"  pm.collectionVariables.set(\"customerEmail\", jsonData.email);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customer/:customerId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customer",
+								":customerId"
+							],
+							"variable": [
+								{
+									"key": "customerId",
+									"value": "{{customerId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[C] By email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customer/by-email?email={{customerEmail}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customer",
+								"by-email"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "{{customerEmail}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[C] By phone",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customer/by-phone?phone={{customerPhone}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customer",
+								"by-phone"
+							],
+							"query": [
+								{
+									"key": "phone",
+									"value": "{{customerPhone}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[C] Get all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customer",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customer"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Vehicle",
+			"item": [
+				{
+					"name": "Create Vehicle",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.status === 200) {\r",
+									"    const jsonData = pm.response.json().data;\r",
+									"    pm.collectionVariables.set(\"vehicleId\", jsonData.id);\r",
+									"} else {\r",
+									"    console.log(\"Respuesta no exitosa. Status: \" + pm.response.status);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"model\": \"Fitito\",\r\n    \"licensePlate\": \"AAA000\",\r\n    \"customerId\": {{customerId}},\r\n    \"type\": \"SUPERCAR\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/vehicle",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"vehicle"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[V] By id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/vehicle/:vehicleId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"vehicle",
+								":vehicleId"
+							],
+							"variable": [
+								{
+									"key": "vehicleId",
+									"value": "{{vehicleId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[V] By customer id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/vehicle/by-customer/:customerId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"vehicle",
+								"by-customer",
+								":customerId"
+							],
+							"variable": [
+								{
+									"key": "customerId",
+									"value": "{{customerId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[V] Assign to customer",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/vehicle/:vehicleId/assign-to-customer/:customerId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"vehicle",
+								":vehicleId",
+								"assign-to-customer",
+								":customerId"
+							],
+							"variable": [
+								{
+									"key": "vehicleId",
+									"value": "{{vehicleId}}"
+								},
+								{
+									"key": "customerId",
+									"value": "{{customerId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Appointment",
+			"item": [
+				{
+					"name": "Create Appointment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.status === 200) {\r",
+									"    const jsonData = pm.response.json().data;\r",
+									"    pm.collectionVariables.set(\"appointmentId\", jsonData.id);\r",
+									"} else {\r",
+									"    console.log(\"Failed response. Status: \" + pm.response.status);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"appointmentDate\": \"06-03-2025 18:00:00\",\r\n    \"status\": \"PENDING\",\r\n    \"type\": \"COMPLETE\",\r\n    \"vehicleId\": {{vehicleId}}\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/appointment",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"appointment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[A] By id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/appointment/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"appointment",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{appointmentId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[A] By vehible id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/appointment/by-vehicle/:vehicleId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"appointment",
+								"by-vehicle",
+								":vehicleId"
+							],
+							"variable": [
+								{
+									"key": "vehicleId",
+									"value": "{{vehicleId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[A] Mark as in progress",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/appointment/:id/mark-as-in-progress",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"appointment",
+								":id",
+								"mark-as-in-progress"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{appointmentId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[A] Mark as finished",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/appointment/:id/mark-as-finished",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"appointment",
+								":id",
+								"mark-as-finished"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{appointmentId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Payment",
+			"item": [
+				{
+					"name": "Create Payment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.status === 200) {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.collectionVariables.set(\"paymentId\", jsonData.id);\r",
+									"} else {\r",
+									"    console.log(\"Failed response. Status: \" + pm.response.status);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amount\": 420000,\r\n    \"type\": \"CASH\",\r\n    \"appointmentId\": {{appointmentId}}\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/payment",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"payment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[P] By id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/payment/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"payment",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{paymentId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[P] By appointment id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/payment/by-appointment/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"payment",
+								"by-appointment",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{appointmentId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://localhost:8080/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "customerId",
+			"value": "248",
+			"type": "string"
+		},
+		{
+			"key": "customerPhone",
+			"value": "\"2612222222\"",
+			"type": "string"
+		},
+		{
+			"key": "customerEmail",
+			"value": "johndoe@gmail.com",
+			"type": "string"
+		},
+		{
+			"key": "vehicleId",
+			"value": ""
+		},
+		{
+			"key": "appointmentId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "paymentId",
+			"value": "0",
+			"type": "default"
+		}
+	]
+}
